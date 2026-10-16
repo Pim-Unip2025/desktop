@@ -184,7 +184,25 @@ O executável final é gerado em `TronusDesktop/bin/Release/net10.0-windows/win-
 
 ---
 
-## 7. Status do Roadmap de Desenvolvimento
+## 7. Documentação de Apoio ao Usuário (`ManualDoUsuario.md`)
+
+Para garantir que alunos, professores e a banca avaliadora do PIM possam usufruir da experiência completa da aplicação desktop, foi elaborado o **Manual do Usuário Oficial** (`ManualDoUsuario.md`), contendo um guia ilustrado passo a passo cobrindo:
+1. **Apresentação e Metáfora Acadêmica:** Explicação da jornada de nobreza (*Plebeu*, *Cavaleiro*, *Duque*, *Rei*) e dos 5 Reinos (Python, C++, Engenharia de Software, Banco de Dados, Redes).
+2. **Requisitos de Sistema e Inicialização:** Como abrir o executável e requisitos de conectividade HTTPS com a nuvem.
+3. **Controles da Janela:** Guia de uso do auto-ajuste inteligente de tela, minimização, maximização protegida e redimensionamento manual.
+4. **Passo a Passo de Telas:**
+   - **Cadastro de Conta:** Preenchimento com validações e auto-login.
+   - **Wizard do Herói:** 4 etapas intuitivas (gênero, nome de batalha, escolha de avatar medieval e confirmação).
+   - **Login e Reconhecimento:** Autenticação rápida com atalho `Enter`.
+   - **Mapa dos Reinos & HUD:** Entendimento dos badges de disponibilidade, barras de evolução e desbloqueio sequencial de fases.
+   - **Quiz & Desafios:** Dificuldades, navegação sequencial, rolagem do enunciado e submissão de respostas.
+   - **Tela de Conquistas:** Preservação da maior pontuação histórica (`GREATEST`) e evolução de insígnias.
+   - **Dashboard:** Análise de rendimento do estudante.
+5. **Solução de Problemas / FAQ:** Tratamento de conexão de rede, firewall e renovação de token JWT.
+
+---
+
+## 8. Status do Roadmap de Desenvolvimento
 
 - [x] Arquitetura base SPA com `MainForm` e `LoadControl`.
 - [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`).
@@ -199,4 +217,5 @@ O executável final é gerado em `TronusDesktop/bin/Release/net10.0-windows/win-
 - [x] `UcDashboard.cs` com visualização de desempenho.
 - [x] Camada de serviços HTTP (`ApiService`, `SessionManager`, `ApiException`).
 - [x] Modelo Thin Client conectado à API NestJS e PostgreSQL Supabase.
+- [x] Manual de Uso Completo do Aluno e Avaliador (`ManualDoUsuario.md`).
 - [x] Exclusão de redundâncias no `.csproj` para compilação limpa com 0 erros.
