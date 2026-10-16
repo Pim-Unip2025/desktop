@@ -206,6 +206,12 @@ Para garantir que alunos, professores e a banca avaliadora do PIM possam usufrui
    - **Dashboard:** Análise de rendimento do estudante.
 5. **Solução de Problemas / FAQ:** Tratamento de conexão de rede, firewall e renovação de token JWT.
 
+### 7.1 Modelagem UML — Diagrama de Casos de Uso (`DiagramaDeCasosDeUso.md`)
+O arquivo formal de engenharia de software foi disponibilizado em `DiagramaDeCasosDeUso.md` (e em `docs/DiagramaDeCasosDeUso.md`), estruturado a partir da modelagem Astah original (`Engenharia de software ágil aplicada.asta`). Ele contempla:
+- **Atores Mapeados:** Estudante (Aluno), Professor, Administrador e Sistema Backend.
+- **Relações de Dependência:** `<<include>>` (autenticação obrigatória e cálculo automático de estrelas) e `<<extend>>` (promoção nobiliárquica de patentes e desbloqueio de novas fases).
+- **Matriz de Rastreabilidade:** Mapeamento integral dos 15 Requisitos Funcionais do PIM (RF01 a RF15) contra cada Caso de Uso (UC01 a UC20).
+
 ---
 
 ## 8. Status do Roadmap de Desenvolvimento
@@ -224,4 +230,5 @@ Para garantir que alunos, professores e a banca avaliadora do PIM possam usufrui
 - [x] Camada de serviços HTTP (`ApiService`, `SessionManager`, `ApiException`).
 - [x] Modelo Thin Client conectado à API NestJS e PostgreSQL Supabase.
 - [x] Manual de Uso Completo do Aluno e Avaliador (`ManualDoUsuario.md`).
+- [x] Modelagem UML e Matriz de Rastreabilidade de Casos de Uso (`DiagramaDeCasosDeUso.md`).
 - [x] Exclusão de redundâncias no `.csproj` para compilação limpa com 0 erros.
