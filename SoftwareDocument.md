@@ -212,6 +212,13 @@ O arquivo formal de engenharia de software foi disponibilizado em `DiagramaDeCas
 - **Relações de Dependência:** `<<include>>` (autenticação obrigatória e cálculo automático de estrelas) e `<<extend>>` (promoção nobiliárquica de patentes e desbloqueio de novas fases).
 - **Matriz de Rastreabilidade:** Mapeamento integral dos 15 Requisitos Funcionais do PIM (RF01 a RF15) contra cada Caso de Uso (UC01 a UC20).
 
+### 7.2 Modelagem UML — Diagrama de Classes (`DiagramaDeClasses.md`)
+A modelagem estrutural das entidades de negócio foi documentada em `DiagramaDeClasses.md` (e em `docs/DiagramaDeClasses.md`), integrando-se à Seção 5.3 do relatório do PIM III e servindo de especificação direta para o Astah UML (`Engenharia de software ágil aplicada.asta`):
+- **Classes de Domínio:** `Usuario`, `Personagem`, `Reino`, `Fase`, `Questao`, `Alternativa`, `ProgressoFase` e `RespostaTentativa`.
+- **Encapsulamento e Tipagem:** Atributos privados (`-`), métodos públicos (`+`) e multiplicidades (`1:1`, `1:3`, `1:5`, `1:N`).
+- **Arquitetura Desktop C#:** Diagrama das classes de apresentação (`MainForm`, `UserControls`) e serviços (`ApiService`, `SessionManager`).
+- **Guia Prático Astah:** Instruções passo a passo de como desenhar e exportar o diagrama a partir do Astah UML.
+
 ---
 
 ## 8. Status do Roadmap de Desenvolvimento
@@ -231,4 +238,5 @@ O arquivo formal de engenharia de software foi disponibilizado em `DiagramaDeCas
 - [x] Modelo Thin Client conectado à API NestJS e PostgreSQL Supabase.
 - [x] Manual de Uso Completo do Aluno e Avaliador (`ManualDoUsuario.md`).
 - [x] Modelagem UML e Matriz de Rastreabilidade de Casos de Uso (`DiagramaDeCasosDeUso.md`).
+- [x] Modelagem UML e Dicionário de Classes do Domínio (`DiagramaDeClasses.md`).
 - [x] Exclusão de redundâncias no `.csproj` para compilação limpa com 0 erros.
