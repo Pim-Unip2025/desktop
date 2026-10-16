@@ -206,6 +206,20 @@ namespace TronusDesktop.Views
             backLabel.MouseEnter += (s, e) => backLabel.ForeColor = Theme.Gold;
             backLabel.MouseLeave += (s, e) => backLabel.ForeColor = Theme.DimText;
             registerCard.Controls.Add(backLabel);
+
+            this.Resize += (s, e) => CenterCard();
+            CenterCard();
+        }
+
+        private void CenterCard()
+        {
+            if (registerCard != null)
+            {
+                registerCard.Location = new Point(
+                    Math.Max(10, (this.ClientSize.Width - registerCard.Width) / 2),
+                    Math.Max(5, (this.ClientSize.Height - registerCard.Height) / 2)
+                );
+            }
         }
 
         #endregion

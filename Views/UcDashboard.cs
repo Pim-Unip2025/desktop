@@ -11,6 +11,7 @@ namespace TronusDesktop.Views
     {
         private TronusPanel statsCard;
         private Label titleLabel;
+        private TronusButton btnVoltar;
 
         public UcDashboard()
         {
@@ -41,7 +42,7 @@ namespace TronusDesktop.Views
             };
             this.Controls.Add(titleLabel);
 
-            var btnVoltar = new TronusButton
+            btnVoltar = new TronusButton
             {
                 Text = "Voltar ao Mapa",
                 Size = new Size(150, 40),
@@ -56,6 +57,24 @@ namespace TronusDesktop.Views
                 Size = new Size(940, 580)
             };
             this.Controls.Add(statsCard);
+
+            this.Resize += (s, e) => AdjustLayout();
+            AdjustLayout();
+        }
+
+        private void AdjustLayout()
+        {
+            if (btnVoltar != null)
+            {
+                btnVoltar.Location = new Point(this.ClientSize.Width - btnVoltar.Width - 40, 40);
+            }
+            if (statsCard != null)
+            {
+                statsCard.Size = new Size(
+                    Math.Max(500, this.ClientSize.Width - 80),
+                    Math.Max(300, this.ClientSize.Height - statsCard.Top - 30)
+                );
+            }
         }
 
         private async void UcDashboard_Load(object sender, EventArgs e)

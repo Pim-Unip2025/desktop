@@ -65,6 +65,20 @@ namespace TronusDesktop.Views
             BuildStep4();
 
             ShowStep(1); // Inicia no passo 1
+
+            this.Resize += (s, e) => CenterCard();
+            CenterCard();
+        }
+
+        private void CenterCard()
+        {
+            if (mainCard != null)
+            {
+                mainCard.Location = new Point(
+                    Math.Max(10, (this.ClientSize.Width - mainCard.Width) / 2),
+                    Math.Max(10, (this.ClientSize.Height - mainCard.Height) / 2)
+                );
+            }
         }
         #endregion
 

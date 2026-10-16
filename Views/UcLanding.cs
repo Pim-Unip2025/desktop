@@ -44,6 +44,7 @@ namespace TronusDesktop.Views
                     e.Graphics.FillRectangle(brush, new Rectangle(0, 0, gradientWidth, this.Height));
                 }
             };
+            this.Resize += (s, e) => this.Invalidate();
 
             tagLabel = new Label
             {

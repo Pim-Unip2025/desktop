@@ -35,10 +35,24 @@ Componente que herda de `Panel`:
 
 ### 2.1 `MainForm.cs`
 O ponto central do programa (A *Single Page Application* adaptada para o desktop):
-- **Sem Bordas:** A propriedade `FormBorderStyle` é configurada para `None`, removendo a barra de título padrão do Windows.
-- **Barra de Título Customizada:** Possui uma `topBar` com o nome do software em dourado e um botão fechar ("X") com transição avermelhada no hover.
-- **Janela Arrastável:** Implementa eventos (`MouseDown`, `MouseMove`, `MouseUp`) na barra de título para permitir movimentação livre da janela pela tela.
-- **Navegador SPA (`LoadControl`):** Possui um `contentPanel` central (tamanho 1024×728). O método `LoadControl(UserControl uc)` limpa os controles atuais e anexa a nova visualização solicitada (ex: da Landing para Login, de Login para Personagem ou Reinos), garantindo navegação suave sem piscar ou recriar janelas.
+- **Sem Bordas:** A propriedade `FormBorderStyle` é configurada para `None`, removendo a barra de título padrão do Windows e garantindo visual imersivo *Dark Fantasy*.
+- **Auto-Ajuste Inteligente ao Iniciar (`AutoAjustarAoIniciar`):**
+  - O sistema inspeciona as dimensões da área de trabalho do usuário (`Screen.PrimaryScreen.WorkingArea`).
+  - **Monitores Compactos (Notebooks ≤ 1366×768 ou telas HD):** Inicia automaticamente em modo maximizado inteligente, garantindo que nenhum botão ou rodapé seja encoberto e que a barra de tarefas do Windows continue visível e acessível.
+  - **Monitores Full HD, 2K ou 4K:** Inicia em modo janela balanceado (ex: 1200×800 ou 75% da resolução) perfeitamente centralizado.
+- **Barra de Título Customizada (TopBar):**
+  - Título estilizado em dourado ("TRONUS — O Caminho do Herói Acadêmico").
+  - Três botões de controle de janela com efeitos no hover:
+    - **Minimizar (`—`):** Reduz o aplicativo para a barra de tarefas do Windows.
+    - **Maximizar / Restaurar (`🗖` / `🗗`):** Alterna suavemente entre o modo janela e o modo maximizado. O ícone se altera automaticamente conforme o estado.
+    - **Fechar (`✕`):** Encerra a aplicação com highlight vermelho de perigo.
+  - Suporta clique duplo na barra de título para alternar entre maximizar e restaurar.
+  - Implementa eventos (`MouseDown`, `MouseMove`, `MouseUp`) para permitir arrastar a janela livremente em modo normal.
+- **Prevenção de Sobreposição da Barra de Tarefas (Win32 `WM_GETMINMAXINFO`):**
+  - Formulários sem borda padrão cobrem a barra de tarefas do Windows ao serem maximizados. O Tronus Desktop intercepta a mensagem `WM_GETMINMAXINFO` (código `0x24`) no `WndProc`, restringindo as coordenadas máximas exatamente à `WorkingArea` do monitor ativo.
+- **Redimensionamento Manual por Bordas (Win32 `WM_NCHITTEST`):**
+  - Permite que o usuário redimensione o formulário livremente arrastando as 4 bordas e os 4 cantos da janela através da interceptação de `WM_NCHITTEST` (código `0x84`).
+- **Navegador SPA (`LoadControl`):** Possui um `contentPanel` com preenchimento total (`Dock = DockStyle.Fill`). O método `LoadControl(UserControl uc)` limpa os controles atuais e anexa a nova visualização solicitada, garantindo navegação suave sem piscar ou recriar janelas.
 
 ---
 
@@ -47,13 +61,14 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 
 ### 3.1 `UcLanding.cs` (Tela Inicial / Hero)
 - Reproduz a experiência da *Hero Section* da aplicação web.
-- Carrega imagem de fundo `img/hero.png` com gradiente escuro dinâmico via GDI+.
+- Carrega imagem de fundo `img/hero.png` com gradiente escuro dinâmico via GDI+, repintando fluidamente ao redimensionar a janela (`Invalidate` no `Resize`).
 - Logotipo copiado automaticamente pela build (`img/logo.png`).
 - Apresenta os botões "CADASTRE-SE AGORA →" e "JÁ TENHO CONTA" instanciados com `TronusButton`, direcionando para `UcRegister` e `UcLogin`.
 
 ### 3.2 `UcLogin.cs` (Autenticação)
 - Utiliza a imagem `img/fundo_reinos.jpg` como fundo esticado para ambientação.
-- Cartão central flutuante (`TronusPanel`) contendo campos de texto para Identificador (usuário ou e-mail) e Senha mascarada (`PasswordChar = '•'`).
+- Cartão central flutuante (`TronusPanel`) com auto-centralização dinâmica (`CenterCard` no evento `Resize`), mantendo alinhamento perfeito em qualquer resolução (HD, Full HD ou 4K).
+- Campos de texto para Identificador (usuário ou e-mail) e Senha mascarada (`PasswordChar = '•'`).
 - Suporta submissão direta ao pressionar a tecla `Enter`.
 - **Integração:** Comunica-se com o endpoint `POST /auth/login`. Ao obter sucesso, salva o token JWT no `SessionManager` e consulta `GET /personagens/me`:
   - Se retornar `404` (aluno sem personagem): Redireciona para `UcCharacter`.
@@ -62,12 +77,13 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 
 ### 3.3 `UcRegister.cs` (Cadastro de Aluno)
 - Fundo contínuo com `img/fundo_reinos.jpg`.
-- Painel central contendo validações de Nome, Celular, E-mail, Senha e Confirmação de Senha.
+- Painel central estilizado com auto-centralização dinâmica (`CenterCard` no evento `Resize`), prevenindo cortes em telas menores.
+- Campos com validações de Nome, Celular, E-mail, Senha e Confirmação de Senha.
 - **Validações:** Valida campos obrigatórios, formato de e-mail e conferência de senhas idênticas.
 - **Integração:** Envia os dados para `POST /auth/register`. Em seguida, realiza o login automático do aluno e o encaminha para a criação de personagem em `UcCharacter`.
 
 ### 3.4 `UcCharacter.cs` (Criação de Personagem)
-- Implementa um fluxo multi-etapas (*Wizard*) em uma única tela, controlando a visibilidade de painéis internos:
+- Cartão central responsivo (`CenterCard`) contendo o fluxo multi-etapas (*Wizard*):
   - **Passo 1:** Escolha de Gênero (Masculino / Feminino).
   - **Passo 2:** Escolha do Nome do Herói com validação de campo vazio.
   - **Passo 3:** Seleção dinâmica do Avatar (carrega imagens `masc1.png` a `masc3.png` ou `fem1.png` a `fem3.png` da pasta `img`).
@@ -75,31 +91,34 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - **Integração:** Envia os dados para `POST /personagens` (`nome`, `genero`, `avatar`), persistindo o personagem no PostgreSQL e avançando para `UcReinos`.
 
 ### 3.5 `UcReinos.cs` (Mapa dos Reinos)
-- Tela principal da jornada acadêmica do aluno no Desktop.
+- Tela principal da jornada acadêmica do aluno no Desktop, com layout 100% responsivo.
 - **HUD Superior do Aluno (Player Topbar):**
+  - Acoplado ao topo (`DockStyle.Top`) preenchendo toda a largura da tela.
   - Avatar do Herói: Miniatura carregada dinamicamente com base no arquivo salvo (`masc1..3` ou `fem1..3`).
   - Nome e Insígnia do Título em destaque dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
   - Contador de Estrelas Total (`⭐ X estrelas`).
   - Barra de Progresso Visual proporcional à meta do próximo título (`X / 15 para Cavaleiro`, `X / 30 para Duque`, `X / 50 para Rei`).
-  - Ações rápidas no cabeçalho: botão "Meu Desempenho 📊" e botão "Sair" (Logout com confirmação).
+  - Ações no cabeçalho dinamicamente alinhadas à direita: botão "Meu Desempenho 📊" e botão "Sair" (Logout com confirmação).
 - **Integração:** Consome simultaneamente `GET /personagens/me`, `GET /reinos` e `GET /personagens/me/progresso`.
-- **Cards dos Reinos Elegantes:**
-  - Carrega a imagem temática de cada disciplina (`img/python.png`, `img/c++.png`, `img/soft.png`, `img/bd.png`, `img/redes.png`).
-  - Badge de status: "DISPONÍVEL" (verde) ou "EM BREVE" (para reinos cujas questões ainda aguardam cadastro pelo professor).
-  - Exibe as 3 fases de cada reino com estrelas conquistadas (`★`) e pendentes (`☆`).
-  - Regra de desbloqueio sequencial: primeira fase liberada; fases seguintes desbloqueadas apenas se a fase anterior tiver pontuação maior que zero. O botão "Jogar" abre diretamente o `UcQuiz`.
+- **Cards dos Reinos Fluidos (`flowReinos`):**
+  - `FlowLayoutPanel` com auto-ajuste de largura e altura no `Resize`, distribuindo os cards em múltiplas colunas automaticamente (adaptando-se de 2 a 5 colunas dependendo se a janela está maximizada ou restaurada).
+  - Imagens temáticas de cada disciplina (`img/python.png`, `img/c++.png`, `img/soft.png`, `img/bd.png`, `img/redes.png`).
+  - Badge de status: "DISPONÍVEL" (verde) ou "EM BREVE".
+  - Fases com estrelas conquistadas (`★`) e pendentes (`☆`).
+  - Regra de desbloqueio sequencial e botão de ação direta para o `UcQuiz`.
 
 ### 3.6 `UcDashboard.cs` (Painel de Desempenho)
-- Painel de análise individual do aluno.
+- Painel de análise individual do aluno com dimensionamento fluido de cards e botão voltar alinhado à direita.
 - Apresenta métricas consolidadas, total de estrelas acumuladas, título honorífico (Plebeu a Rei) e taxa percentual de acertos.
 - Botão "Voltar ao Mapa" para retorno ágil a `UcReinos`.
 
 ### 3.7 `UcQuiz.cs` (Desafio / Quiz da Fase)
 - Núcleo da experiência gamificada de aprendizado do Tronus no Desktop.
-- **Carregamento Seguro:** Consome `GET /fases/{id}/questoes`. As questões chegam à tela sem a indicação da alternativa correta para impedir trapaça ou inspeção de memória.
-- **Interface e Navegação:** Enunciado com rolagem dedicada, badge de dificuldade, botões de alternativas (A a E) com realce visual em dourado/verde esmeralda ao selecionar, e navegação sequencial (Questão 1 a 5) com botões "Anterior" e "Próxima".
-- **Submissão e Regras:** Na 5ª questão, o botão avança para "FINALIZAR ⚔". O sistema valida que todas as questões foram respondidas e envia `POST /fases/{id}/responder` contendo a lista de `{ questaoId, alternativaId }`.
-- **Tela de Conquista / Resultados:** Exibe estrelas conquistadas (`★`/`☆`), taxa percentual de acerto, comparação com a melhor pontuação da fase, título atualizado do herói e botão para retornar ao mapa dos reinos.
+- **Layout Responsivo Inteligente (`AdjustLayout`):** Card de questões (`questionCard`), caixa do enunciado e alternativas que se expandem dinamicamente acompanhando o tamanho da janela, com botões de navegação reposicionados automaticamente no rodapé do card.
+- **Carregamento Seguro:** Consome `GET /fases/{id}/questoes` sem expor a alternativa correta na memória inicial.
+- **Interface e Navegação:** Enunciado com rolagem dedicada, badge de dificuldade, botões de alternativas (A a E) com realce visual em dourado/verde esmeralda, e navegação sequencial com botões "Anterior" e "Próxima".
+- **Submissão e Regras:** Na 5ª questão, o botão avança para "FINALIZAR ⚔". O sistema envia `POST /fases/{id}/responder` contendo `{ questaoId, alternativaId }`.
+- **Tela de Conquista / Resultados:** Cartão de resultado centralizado dinamicamente (`resultCard`), exibindo estrelas (`★`/`☆`), taxa percentual de acerto, comparação com a melhor pontuação da fase, título atualizado e retorno ao mapa.
 
 ---
 
@@ -169,11 +188,13 @@ O executável final é gerado em `TronusDesktop/bin/Release/net10.0-windows/win-
 
 - [x] Arquitetura base SPA com `MainForm` e `LoadControl`.
 - [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`).
+- [x] Auto-ajuste de janela inteligente por resolução (`AutoAjustarAoIniciar`), tela cheia sem cobrir a barra de tarefas (`WM_GETMINMAXINFO`) e controles de janela na barra de título (Minimizar, Maximizar/Restaurar, Fechar).
+- [x] Redimensionamento fluido por arrasto de bordas (`WM_NCHITTEST`) e controles responsivos (`CenterCard` e `AdjustLayout`).
 - [x] `UcLanding.cs` com arte medieval e redirecionamento.
 - [x] `UcLogin.cs` integrado à API REST e validação de sessão.
 - [x] `UcRegister.cs` integrado com criação de conta e auto-login.
 - [x] `UcCharacter.cs` com fluxo wizard e cadastro de herói na API.
-- [x] `UcReinos.cs` com carregamento dinâmico dos 5 reinos e estrelas.
+- [x] `UcReinos.cs` com HUD superior completo, carregamento dinâmico dos 5 reinos e estrelas.
 - [x] `UcQuiz.cs` com jogabilidade de desafios, submissão de respostas e tela de resultados.
 - [x] `UcDashboard.cs` com visualização de desempenho.
 - [x] Camada de serviços HTTP (`ApiService`, `SessionManager`, `ApiException`).

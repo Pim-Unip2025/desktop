@@ -73,8 +73,8 @@ namespace TronusDesktop.Views
             // ═══════════════════════════════════════════════════
             topHudPanel = new Panel
             {
-                Location = new Point(0, 0),
-                Size = new Size(1024, 75),
+                Dock = DockStyle.Top,
+                Height = 75,
                 BackColor = Color.FromArgb(220, 15, 12, 10)
             };
             topHudPanel.Paint += (s, e) =>
@@ -187,6 +187,12 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
+            topHudPanel.Resize += (s, e) =>
+            {
+                btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
+                btnDashboard.Location = new Point(btnLogout.Left - btnDashboard.Width - 15, 18);
+            };
+
             // ═══════════════════════════════════════════════════
             // 2. CABEÇALHO DO MAPA
             // ═══════════════════════════════════════════════════
@@ -226,6 +232,17 @@ namespace TronusDesktop.Views
                 BackColor = Color.Transparent
             };
             this.Controls.Add(flowReinos);
+
+            this.Resize += (s, e) =>
+            {
+                if (flowReinos != null)
+                {
+                    flowReinos.Size = new Size(
+                        Math.Max(300, this.ClientSize.Width - 40),
+                        Math.Max(200, this.ClientSize.Height - flowReinos.Top - 20)
+                    );
+                }
+            };
         }
 
         private async void UcReinos_Load(object sender, EventArgs e)

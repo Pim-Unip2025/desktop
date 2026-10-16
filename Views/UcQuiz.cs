@@ -153,6 +153,56 @@ namespace TronusDesktop.Views
             };
             btnProxima.Click += BtnProxima_Click;
             questionCard.Controls.Add(btnProxima);
+
+            this.Resize += (s, e) => AdjustLayout();
+            AdjustLayout();
+        }
+
+        private void AdjustLayout()
+        {
+            if (btnSair != null)
+            {
+                btnSair.Location = new Point(this.ClientSize.Width - btnSair.Width - 40, 25);
+            }
+
+            if (questionCard != null)
+            {
+                questionCard.Size = new Size(
+                    Math.Max(500, this.ClientSize.Width - 80),
+                    Math.Max(350, this.ClientSize.Height - questionCard.Top - 25)
+                );
+
+                if (enunciadoBox != null)
+                    enunciadoBox.Width = questionCard.ClientSize.Width - 50;
+
+                if (flowAlternativas != null)
+                {
+                    flowAlternativas.Width = questionCard.ClientSize.Width - 50;
+                    flowAlternativas.Height = Math.Max(120, questionCard.ClientSize.Height - flowAlternativas.Top - 65);
+
+                    foreach (Control c in flowAlternativas.Controls)
+                    {
+                        if (c is Button b)
+                        {
+                            b.Width = flowAlternativas.ClientSize.Width - 25;
+                        }
+                    }
+                }
+
+                if (btnProxima != null)
+                    btnProxima.Location = new Point(questionCard.ClientSize.Width - btnProxima.Width - 25, questionCard.ClientSize.Height - 50);
+
+                if (btnAnterior != null)
+                    btnAnterior.Location = new Point(25, questionCard.ClientSize.Height - 50);
+            }
+
+            if (resultCard != null)
+            {
+                resultCard.Location = new Point(
+                    Math.Max(10, (this.ClientSize.Width - resultCard.Width) / 2),
+                    Math.Max(20, (this.ClientSize.Height - resultCard.Height) / 2)
+                );
+            }
         }
 
         private async void UcQuiz_Load(object sender, EventArgs e)
@@ -198,7 +248,7 @@ namespace TronusDesktop.Views
                 var btnAlt = new Button
                 {
                     Text = $"  [{alt.Letra}]  {alt.Texto}",
-                    Size = new Size(865, 45),
+                    Size = new Size(Math.Max(300, flowAlternativas.ClientSize.Width - 25), 45),
                     Margin = new Padding(0, 0, 0, 8),
                     TextAlign = ContentAlignment.MiddleLeft,
                     Font = new Font("Segoe UI", 10.5F),
@@ -306,6 +356,7 @@ namespace TronusDesktop.Views
                 Size = new Size(600, 520)
             };
             this.Controls.Add(resultCard);
+            AdjustLayout();
 
             var title = new Label
             {
