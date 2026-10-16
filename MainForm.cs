@@ -62,7 +62,12 @@ namespace TronusDesktop
             {
                 Height = 40,
                 Dock = DockStyle.Top,
-                BackColor = Theme.CardBackground
+                BackColor = Color.FromArgb(18, 16, 14)
+            };
+            topBar.Paint += (s, e) =>
+            {
+                using var pen = new Pen(Theme.BorderColor, 1);
+                e.Graphics.DrawLine(pen, 0, topBar.Height - 1, topBar.Width, topBar.Height - 1);
             };
             topBar.MouseDown += TopBar_MouseDown;
             topBar.MouseMove += TopBar_MouseMove;
@@ -149,8 +154,6 @@ namespace TronusDesktop
             windowButtonsPanel.Controls.Add(closeBtn);
             topBar.Controls.Add(windowButtonsPanel);
 
-            this.Controls.Add(topBar);
-
             // Painel central hospedeiro dos UserControls
             contentPanel = new Panel
             {
@@ -158,8 +161,8 @@ namespace TronusDesktop
                 BackColor = Color.Transparent
             };
             this.Controls.Add(contentPanel);
-            contentPanel.BringToFront();
-            topBar.BringToFront();
+            this.Controls.Add(topBar);
+            topBar.SendToBack();
 
             LoadControl(new Views.UcLanding());
         }

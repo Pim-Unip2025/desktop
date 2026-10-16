@@ -26,6 +26,7 @@ namespace TronusDesktop.Views
         private TronusButton btnLogout;
 
         // Cabeçalho da página
+        private TronusPanel headerCard;
         private Label titleLabel;
         private Label subtitleLabel;
 
@@ -67,6 +68,13 @@ namespace TronusDesktop.Views
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
+
+            // Suave camada escura sobre o mapa para dar a atmosfera medieval e garantir excelente contraste
+            this.Paint += (s, e) =>
+            {
+                using var brush = new SolidBrush(Color.FromArgb(90, 15, 12, 10));
+                e.Graphics.FillRectangle(brush, this.ClientRectangle);
+            };
 
             // ═══════════════════════════════════════════════════
             // 1. HUD SUPERIOR DO ALUNO (PLAYER TOPBAR)
@@ -187,44 +195,49 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
-            topHudPanel.Resize += (s, e) =>
-            {
-                btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
-                btnDashboard.Location = new Point(btnLogout.Left - btnDashboard.Width - 15, 18);
-            };
+            topHudPanel.Resize += (s, e) => RepositionHudButtons();
+            RepositionHudButtons();
 
             // ═══════════════════════════════════════════════════
-            // 2. CABEÇALHO DO MAPA
+            // 2. CABEÇALHO DO MAPA (CARD DE ALTO CONTRASTE)
             // ═══════════════════════════════════════════════════
+            headerCard = new TronusPanel
+            {
+                Location = new Point(20, 90),
+                Size = new Size(Math.Max(300, this.ClientSize.Width - 40), 68),
+                BackColor = Color.Transparent
+            };
+            this.Controls.Add(headerCard);
+
             titleLabel = new Label
             {
                 Text = "⚔️ MAPA DOS REINOS",
                 ForeColor = Theme.Gold,
-                Font = new Font("Segoe UI", 18F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
                 AutoSize = true,
-                Location = new Point(25, 90),
+                Location = new Point(15, 10),
                 BackColor = Color.Transparent
             };
-            this.Controls.Add(titleLabel);
+            headerCard.Controls.Add(titleLabel);
 
             subtitleLabel = new Label
             {
                 Text = "Escolha uma matéria, enfrente os desafios das fases e conquiste suas estrelas.",
-                ForeColor = Theme.PrimaryText,
+                ForeColor = Color.FromArgb(235, 230, 215),
                 Font = new Font("Segoe UI", 10F),
                 AutoSize = true,
-                Location = new Point(27, 125),
+                Location = new Point(18, 38),
                 BackColor = Color.Transparent
             };
-            this.Controls.Add(subtitleLabel);
+            headerCard.Controls.Add(subtitleLabel);
 
             // ═══════════════════════════════════════════════════
             // 3. CONTAINER DOS REINOS (FLOWLAYOUTPANEL)
             // ═══════════════════════════════════════════════════
             flowReinos = new FlowLayoutPanel
             {
-                Location = new Point(20, 155),
-                Size = new Size(984, 550),
+                Location = new Point(20, 168),
+                Size = new Size(984, 540),
                 AutoScroll = true,
                 FlowDirection = FlowDirection.LeftToRight,
                 WrapContents = true,
@@ -235,6 +248,10 @@ namespace TronusDesktop.Views
 
             this.Resize += (s, e) =>
             {
+                if (headerCard != null)
+                {
+                    headerCard.Size = new Size(Math.Max(300, this.ClientSize.Width - 40), 68);
+                }
                 if (flowReinos != null)
                 {
                     flowReinos.Size = new Size(
@@ -242,7 +259,17 @@ namespace TronusDesktop.Views
                         Math.Max(200, this.ClientSize.Height - flowReinos.Top - 20)
                     );
                 }
+                RepositionHudButtons();
             };
+        }
+
+        private void RepositionHudButtons()
+        {
+            if (btnLogout != null && btnDashboard != null && topHudPanel != null)
+            {
+                btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
+                btnDashboard.Location = new Point(btnLogout.Left - btnDashboard.Width - 12, 18);
+            }
         }
 
         private async void UcReinos_Load(object sender, EventArgs e)

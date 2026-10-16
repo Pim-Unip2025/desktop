@@ -42,12 +42,14 @@ O ponto central do programa (A *Single Page Application* adaptada para o desktop
   - **Monitores Full HD, 2K ou 4K:** Inicia em modo janela balanceado (ex: 1200×800 ou 75% da resolução) perfeitamente centralizado.
 - **Barra de Título Customizada (TopBar):**
   - Título estilizado em dourado ("TRONUS — O Caminho do Herói Acadêmico").
+  - Fundo escuro sólido (`#12100E`) com divisor inferior dourado fino de 1px.
   - Três botões de controle de janela com efeitos no hover:
     - **Minimizar (`—`):** Reduz o aplicativo para a barra de tarefas do Windows.
     - **Maximizar / Restaurar (`🗖` / `🗗`):** Alterna suavemente entre o modo janela e o modo maximizado. O ícone se altera automaticamente conforme o estado.
     - **Fechar (`✕`):** Encerra a aplicação com highlight vermelho de perigo.
   - Suporta clique duplo na barra de título para alternar entre maximizar e restaurar.
   - Implementa eventos (`MouseDown`, `MouseMove`, `MouseUp`) para permitir arrastar a janela livremente em modo normal.
+  - **Hierarquia de Z-Order e Não-Sobreposição:** O `topBar` é configurado com `SendToBack()` antes do `contentPanel` (`DockStyle.Fill`), garantindo que o painel de conteúdo inicie estritamente a partir do pixel vertical Y=40, sem sobrepor ou encobrir os controles superiores dos UserControls.
 - **Prevenção de Sobreposição da Barra de Tarefas (Win32 `WM_GETMINMAXINFO`):**
   - Formulários sem borda padrão cobrem a barra de tarefas do Windows ao serem maximizados. O Tronus Desktop intercepta a mensagem `WM_GETMINMAXINFO` (código `0x24`) no `WndProc`, restringindo as coordenadas máximas exatamente à `WorkingArea` do monitor ativo.
 - **Redimensionamento Manual por Bordas (Win32 `WM_NCHITTEST`):**
@@ -91,14 +93,18 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - **Integração:** Envia os dados para `POST /personagens` (`nome`, `genero`, `avatar`), persistindo o personagem no PostgreSQL e avançando para `UcReinos`.
 
 ### 3.5 `UcReinos.cs` (Mapa dos Reinos)
-- Tela principal da jornada acadêmica do aluno no Desktop, com layout 100% responsivo.
+- Tela principal da jornada acadêmica do aluno no Desktop, com layout 100% responsivo e temática Dark Fantasy.
+- **Camada Atmosférica de Contraste:** O evento `Paint` aplica uma camada escura translúcida sobre `fundo_reinos.jpg`, prevenindo áreas estouradas e clareadas do pergaminho do mapa.
 - **HUD Superior do Aluno (Player Topbar):**
-  - Acoplado ao topo (`DockStyle.Top`) preenchendo toda a largura da tela.
+  - Acoplado ao topo (`DockStyle.Top`, altura 75px) preenchendo toda a largura da tela.
   - Avatar do Herói: Miniatura carregada dinamicamente com base no arquivo salvo (`masc1..3` ou `fem1..3`).
-  - Nome e Insígnia do Título em destaque dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
+  - Nome do Herói em destaque branco nítido e Insígnia do Título em dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
   - Contador de Estrelas Total (`⭐ X estrelas`).
   - Barra de Progresso Visual proporcional à meta do próximo título (`X / 15 para Cavaleiro`, `X / 30 para Duque`, `X / 50 para Rei`).
-  - Ações no cabeçalho dinamicamente alinhadas à direita: botão "Meu Desempenho 📊" e botão "Sair" (Logout com confirmação).
+  - Ações no cabeçalho dinamicamente alinhadas à direita via `RepositionHudButtons()`: botão "Meu Desempenho 📊" e botão "Sair", ambos 100% visíveis e centralizados verticalmente no HUD.
+- **Card de Título em Alto Contraste (`headerCard`):**
+  - Painel estilizado `TronusPanel` translúcido com borda dourada que envolve o título `⚔️ MAPA DOS REINOS` e o subtítulo `Escolha uma matéria, enfrente os desafios das fases e conquiste suas estrelas.`.
+  - Garante legibilidade impecável e alto contraste para o texto marfim/pergaminho (`#EBE6D7`), eliminando qualquer conflito com o mapa ao fundo.
 - **Integração:** Consome simultaneamente `GET /personagens/me`, `GET /reinos` e `GET /personagens/me/progresso`.
 - **Cards dos Reinos Fluidos (`flowReinos`):**
   - `FlowLayoutPanel` com auto-ajuste de largura e altura no `Resize`, distribuindo os cards em múltiplas colunas automaticamente (adaptando-se de 2 a 5 colunas dependendo se a janela está maximizada ou restaurada).
