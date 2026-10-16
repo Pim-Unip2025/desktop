@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\TronusDesktop.csproj": {}
+    "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\desktop\\TronusDesktop.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\TronusDesktop.csproj": {
+    "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\desktop\\TronusDesktop.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\TronusDesktop.csproj",
+        "projectUniqueName": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\desktop\\TronusDesktop.csproj",
         "projectName": "TronusDesktop",
-        "projectPath": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\TronusDesktop.csproj",
+        "projectPath": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\desktop\\TronusDesktop.csproj",
         "packagesPath": "C:\\Users\\Eric\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\obj\\",
+        "outputPath": "C:\\Users\\Eric\\Documents\\PIM - Tronus\\Tronus\\TronusDesktop\\desktop\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Eric\\AppData\\Roaming\\NuGet\\NuGet.Config"
