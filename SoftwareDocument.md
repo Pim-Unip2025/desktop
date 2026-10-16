@@ -86,6 +86,13 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - Apresenta métricas consolidadas, total de estrelas acumuladas, título honorífico (Plebeu a Rei) e taxa percentual de acertos.
 - Botão "Voltar ao Mapa" para retorno ágil a `UcReinos`.
 
+### 3.7 `UcQuiz.cs` (Desafio / Quiz da Fase)
+- Núcleo da experiência gamificada de aprendizado do Tronus no Desktop.
+- **Carregamento Seguro:** Consome `GET /fases/{id}/questoes`. As questões chegam à tela sem a indicação da alternativa correta para impedir trapaça ou inspeção de memória.
+- **Interface e Navegação:** Enunciado com rolagem dedicada, badge de dificuldade, botões de alternativas (A a E) com realce visual em dourado/verde esmeralda ao selecionar, e navegação sequencial (Questão 1 a 5) com botões "Anterior" e "Próxima".
+- **Submissão e Regras:** Na 5ª questão, o botão avança para "FINALIZAR ⚔". O sistema valida que todas as questões foram respondidas e envia `POST /fases/{id}/responder` contendo a lista de `{ questaoId, alternativaId }`.
+- **Tela de Conquista / Resultados:** Exibe estrelas conquistadas (`★`/`☆`), taxa percentual de acerto, comparação com a melhor pontuação da fase, título atualizado do herói e botão para retornar ao mapa dos reinos.
+
 ---
 
 ## 4. Camada de Integração e Comunicação (Thin Client + API REST)
@@ -111,6 +118,7 @@ Mantém as credenciais e o perfil do usuário logado durante o ciclo de vida da 
 - `PersonagemModels.cs`: `CriarPersonagemRequest`, `PersonagemDto`.
 - `ReinoModels.cs`: `ReinoDto`, `ProgressoFaseDto`.
 - `DashboardModels.cs`: DTOs de resumo, histórico de respostas e métricas por reino.
+- `QuizModels.cs`: `QuestaoDto`, `AlternativaDto`, `EnviarRespostasRequest`, `ItemRespostaRequest`, `ResultadoQuizResponse`, `ItemCorrecaoDto`.
 - `ApiErrorResponse.cs`: Formato padrão de erro do NestJS (`statusCode`, `message`, `error`).
 
 ---
@@ -158,6 +166,7 @@ O executável final é gerado em `TronusDesktop/bin/Release/net10.0-windows/win-
 - [x] `UcRegister.cs` integrado com criação de conta e auto-login.
 - [x] `UcCharacter.cs` com fluxo wizard e cadastro de herói na API.
 - [x] `UcReinos.cs` com carregamento dinâmico dos 5 reinos e estrelas.
+- [x] `UcQuiz.cs` com jogabilidade de desafios, submissão de respostas e tela de resultados.
 - [x] `UcDashboard.cs` com visualização de desempenho.
 - [x] Camada de serviços HTTP (`ApiService`, `SessionManager`, `ApiException`).
 - [x] Modelo Thin Client conectado à API NestJS e PostgreSQL Supabase.

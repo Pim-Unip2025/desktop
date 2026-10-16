@@ -128,7 +128,7 @@ namespace TronusDesktop.Views
                             Location = new Point(190, yFase - 5),
                             Font = new Font("Segoe UI", 9F)
                         };
-                        btnJogar.Click += (s, e) => MessageBox.Show($"Indo para a Fase {fase.FaseId}!"); // TODO: Navegar para Quiz
+                        btnJogar.Click += (s, e) => (this.FindForm() as MainForm)?.LoadControl(new UcQuiz(fase.FaseId, fase.FaseNome, reino.Nome));
                         card.Controls.Add(btnJogar);
                     }
 
