@@ -75,11 +75,19 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - **Integração:** Envia os dados para `POST /personagens` (`nome`, `genero`, `avatar`), persistindo o personagem no PostgreSQL e avançando para `UcReinos`.
 
 ### 3.5 `UcReinos.cs` (Mapa dos Reinos)
-- Tela principal da jornada acadêmica do aluno.
-- **Integração:** Consome simultaneamente `GET /reinos` e `GET /personagens/me/progresso`.
-- **Renderização Dinâmica:** Renderiza os cards dos 5 reinos (Python, C++, Engenharia de Software, Banco de Dados e Redes) em um `FlowLayoutPanel`.
-- **Gamificação:** Exibe as fases de cada reino com estrelas conquistadas (`★`) e pendentes (`☆`). Libera o botão "Jogar" conforme a ordem e pré-requisitos de fases.
-- **Navegação:** Botão "Meu Desempenho" direcionando para o dashboard.
+- Tela principal da jornada acadêmica do aluno no Desktop.
+- **HUD Superior do Aluno (Player Topbar):**
+  - Avatar do Herói: Miniatura carregada dinamicamente com base no arquivo salvo (`masc1..3` ou `fem1..3`).
+  - Nome e Insígnia do Título em destaque dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
+  - Contador de Estrelas Total (`⭐ X estrelas`).
+  - Barra de Progresso Visual proporcional à meta do próximo título (`X / 15 para Cavaleiro`, `X / 30 para Duque`, `X / 50 para Rei`).
+  - Ações rápidas no cabeçalho: botão "Meu Desempenho 📊" e botão "Sair" (Logout com confirmação).
+- **Integração:** Consome simultaneamente `GET /personagens/me`, `GET /reinos` e `GET /personagens/me/progresso`.
+- **Cards dos Reinos Elegantes:**
+  - Carrega a imagem temática de cada disciplina (`img/python.png`, `img/c++.png`, `img/soft.png`, `img/bd.png`, `img/redes.png`).
+  - Badge de status: "DISPONÍVEL" (verde) ou "EM BREVE" (para reinos cujas questões ainda aguardam cadastro pelo professor).
+  - Exibe as 3 fases de cada reino com estrelas conquistadas (`★`) e pendentes (`☆`).
+  - Regra de desbloqueio sequencial: primeira fase liberada; fases seguintes desbloqueadas apenas se a fase anterior tiver pontuação maior que zero. O botão "Jogar" abre diretamente o `UcQuiz`.
 
 ### 3.6 `UcDashboard.cs` (Painel de Desempenho)
 - Painel de análise individual do aluno.
