@@ -72,9 +72,11 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - Cartão central flutuante (`TronusPanel`) com auto-centralização dinâmica (`CenterCard` no evento `Resize`), mantendo alinhamento perfeito em qualquer resolução (HD, Full HD ou 4K).
 - Campos de texto para Identificador (usuário ou e-mail) e Senha mascarada (`PasswordChar = '•'`).
 - Suporta submissão direta ao pressionar a tecla `Enter`.
-- **Integração:** Comunica-se com o endpoint `POST /auth/login`. Ao obter sucesso, salva o token JWT no `SessionManager` e consulta `GET /personagens/me`:
-  - Se retornar `404` (aluno sem personagem): Redireciona para `UcCharacter`.
-  - Se retornar `200` (personagem já cadastrado): Redireciona diretamente para `UcReinos`.
+- Link "Esqueci a senha 🔑" direcionando para o fluxo em 3 etapas de `UcForgotPassword`.
+- **Roteamento Inteligente por Papel de Acesso:**
+  - **Aluno:** Consulta `GET /personagens/me`. Se `404` (sem herói), direciona para `UcCharacter`. Se `200` (herói forjado), direciona para `UcReinos`.
+  - **Professor (`professor`):** Direciona automaticamente para o painel pedagógico `UcProfessor`.
+  - **Administrador (`admin`):** Direciona automaticamente para a governança do sistema em `UcAdmin`.
 - Botão "Voltar" funcional retornando à `UcLanding`.
 
 ### 3.3 `UcRegister.cs` (Cadastro de Aluno)
@@ -101,7 +103,7 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
   - Nome do Herói em destaque branco nítido e Insígnia do Título em dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
   - Contador de Estrelas Total (`⭐ X estrelas`).
   - Barra de Progresso Visual proporcional à meta do próximo título (`X / 15 para Cavaleiro`, `X / 30 para Duque`, `X / 50 para Rei`).
-  - Ações no cabeçalho dinamicamente alinhadas à direita via `RepositionHudButtons()`: botão "Meu Desempenho 📊" e botão "Sair", ambos 100% visíveis e centralizados verticalmente no HUD.
+  - Ações no cabeçalho dinamicamente alinhadas à direita via `RepositionHudButtons()`: botão "Ranking 🏆", botão "Meu Desempenho 📊" e botão "Sair", todos 100% visíveis e centralizados verticalmente no HUD.
 - **Card de Título em Alto Contraste (`headerCard`):**
   - Painel estilizado `TronusPanel` translúcido com borda dourada que envolve o título `⚔️ MAPA DOS REINOS` e o subtítulo `Escolha uma matéria, enfrente os desafios das fases e conquiste suas estrelas.`.
   - Garante legibilidade impecável e alto contraste para o texto marfim/pergaminho (`#EBE6D7`), eliminando qualquer conflito com o mapa ao fundo.
@@ -125,6 +127,47 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - **Interface e Navegação:** Enunciado com rolagem dedicada, badge de dificuldade, botões de alternativas (A a E) com realce visual em dourado/verde esmeralda, e navegação sequencial com botões "Anterior" e "Próxima".
 - **Submissão e Regras:** Na 5ª questão, o botão avança para "FINALIZAR ⚔". O sistema envia `POST /fases/{id}/responder` contendo `{ questaoId, alternativaId }`.
 - **Tela de Conquista / Resultados:** Cartão de resultado centralizado dinamicamente (`resultCard`), exibindo estrelas (`★`/`☆`), taxa percentual de acerto, comparação com a melhor pontuação da fase, título atualizado e retorno ao mapa.
+
+### 3.8 `UcForgotPassword.cs` (Recuperação de Senha — RF10)
+- Reproduz a experiência mística de restauração de credenciais do herói.
+- Painel central estilizado com auto-centralização dinâmica (`CenterCard` no `Resize`).
+- **Fluxo Guiado em 3 Etapas (*Wizard*):**
+  - **Passo 1 (Identificação):** Coleta o número de celular cadastrado no perfil do aluno.
+  - **Passo 2 (Validação de Segurança):** Exibe banner simulado com código SMS de 6 dígitos gerado aleatoriamente (`TRONUS-XXXXXX`) e campo com máscara para validação imediata pelo avaliador acadêmico.
+  - **Passo 3 (Definição de Nova Senha):** Permite redefinir a nova chave secreta com confirmação e validação de tamanho mínimo, redirecionando o aluno com mensagem de sucesso de volta para `UcLogin`.
+
+### 3.9 `UcRanking.cs` (Hall dos Heróis / Leaderboard do Reino)
+- Traz o aspecto de competição saudável e gamificação do Tronus para o Desktop.
+- **Pódio de Honra (Top 3):**
+  - 🥇 **1º Lugar (Ouro):** Card dourado com coroa, avatar em destaque, patente nobre (*Rei do Código*), estrelas acumuladas e taxa de acerto.
+  - 🥈 **2º Lugar (Prata):** Card prateado brilhante (*Duquesa dos Dados*).
+  - 🥉 **3º Lugar (Bronze):** Card bronze rústico (*Cavaleiro do Software*).
+- **Tabela de Heróis em Ascensão (4º ao 10º Lugar):** Grade detalhada contendo posição, nome do herói, patente, matéria de destaque, estrelas e porcentagem de acertos.
+- **Card de Posição do Jogador:** Exibe a posição e o progresso do usuário logado em tempo real, incentivando novas tentativas nas fases.
+- Botão "← Voltar ao Mapa" acoplado ao HUD superior para navegação ágil.
+
+### 3.10 `UcProfessor.cs` (Portal do Professor — Gestão Pedagógica — RF11 e RF12)
+- Interface especializada para docentes da UNIP gerenciarem o conteúdo pedagógico do seu respectivo reino acadêmico.
+- **Topbar Personalizada:** Exibe nome do professor autenticado, disciplina vinculada (ex: *Reino de Python*) e botão de logout.
+- **Sistema de Abas Dinâmicas:**
+  - **Aba 1 (Banco de Questões por Fase):**
+    - Seletor suspenso para alternar entre as 5 fases da matéria.
+    - Listagem de desafios cadastrados com indicação visual clara da alternativa correta (gabarito em verde esmeralda) e justificativa pedagógica.
+    - Exclusão interativa com modal de confirmação.
+    - Formulário embutido para cadastro de novas questões (enunciado, opções A/B/C/D, gabarito e feedback).
+  - **Aba 2 (Desempenho e Busca de Alunos):**
+    - Campo de busca instantânea por nome ou e-mail de estudante.
+    - Tabela de aproveitamento exibindo: Aluno, Herói forjado, Patente nobre, Estrelas totais, Fases concluídas de 5 e Taxa percentual de acerto.
+
+### 3.11 `UcAdmin.cs` (Painel Administrativo — Governança Global — RF13)
+- Módulo de gestão de governança e infraestrutura do Tronus Desktop para administradores do sistema.
+- **Painel de Métricas e KPIs Globais:** Cards estilizados exibindo contadores de usuários totais, heróis ativos, total de questões no acervo, estrelas acumuladas e taxa média geral de acertos.
+- **Gerenciamento Completo de Usuários:**
+  - Filtro interativo em tempo real por nome, e-mail ou papel (`aluno`, `professor`, `admin`).
+  - Badges coloridos diferenciados para cada permissão de acesso.
+  - Ação rápida para promoção/alternância de papel de acesso (`Papel ⟳`).
+  - Exclusão com proteção que impede deletar a conta mestre de administrador.
+  - Modal interativo para criação manual de novos usuários administrativos, docentes ou calouros.
 
 ---
 

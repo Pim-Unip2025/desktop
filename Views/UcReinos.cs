@@ -22,6 +22,7 @@ namespace TronusDesktop.Views
         private Label lblProgressText;
         private Panel progressBarBg;
         private Panel progressBarFill;
+        private TronusButton btnRanking;
         private TronusButton btnDashboard;
         private TronusButton btnLogout;
 
@@ -165,6 +166,17 @@ namespace TronusDesktop.Views
             };
             progressBarBg.Controls.Add(progressBarFill);
 
+            // Botão Ranking dos Heróis
+            btnRanking = new TronusButton
+            {
+                Text = "Ranking 🏆",
+                Size = new Size(130, 38),
+                Location = new Point(578, 18),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+            };
+            btnRanking.Click += (s, e) => (this.FindForm() as MainForm)?.LoadControl(new UcRanking());
+            topHudPanel.Controls.Add(btnRanking);
+
             // Botão Meu Desempenho
             btnDashboard = new TronusButton
             {
@@ -268,7 +280,11 @@ namespace TronusDesktop.Views
             if (btnLogout != null && btnDashboard != null && topHudPanel != null)
             {
                 btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
-                btnDashboard.Location = new Point(btnLogout.Left - btnDashboard.Width - 12, 18);
+                btnDashboard.Location = new Point(btnLogout.Left - btnDashboard.Width - 10, 18);
+                if (btnRanking != null)
+                {
+                    btnRanking.Location = new Point(btnDashboard.Left - btnRanking.Width - 10, 18);
+                }
             }
         }
 

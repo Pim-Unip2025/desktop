@@ -130,6 +130,23 @@ namespace TronusDesktop.Views
             backLabel.MouseLeave += (s, e) => backLabel.ForeColor = Theme.DimText;
             loginCard.Controls.Add(backLabel);
 
+            var forgotLabel = new Label
+            {
+                Text = "Esqueci a senha 🔑",
+                ForeColor = Theme.DimText,
+                Font = new Font("Segoe UI", 9.5F),
+                AutoSize = true,
+                Location = new Point(230, 380),
+                BackColor = Color.Transparent,
+                Cursor = Cursors.Hand
+            };
+            forgotLabel.Click += (s, e) => {
+                (this.FindForm() as MainForm)?.LoadControl(new UcForgotPassword());
+            };
+            forgotLabel.MouseEnter += (s, e) => forgotLabel.ForeColor = Theme.Gold;
+            forgotLabel.MouseLeave += (s, e) => forgotLabel.ForeColor = Theme.DimText;
+            loginCard.Controls.Add(forgotLabel);
+
             this.Resize += (s, e) => CenterCard();
             CenterCard();
         }
@@ -205,10 +222,20 @@ namespace TronusDesktop.Views
                         (this.FindForm() as MainForm)?.LoadControl(new UcCharacter());
                     }
                 }
+                else if (res.Usuario.Papel == "professor")
+                {
+                    MessageBox.Show($"Bem-vindo(a), Professor(a) {res.Usuario.Nome}!\nAcessando o Portal Pedagógico...", "Painel do Professor", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    (this.FindForm() as MainForm)?.LoadControl(new UcProfessor());
+                }
+                else if (res.Usuario.Papel == "admin")
+                {
+                    MessageBox.Show($"Bem-vindo(a), Administrador(a) {res.Usuario.Nome}!\nAcessando o Painel de Governança...", "Painel de Administração", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    (this.FindForm() as MainForm)?.LoadControl(new UcAdmin());
+                }
                 else 
                 {
                     MessageBox.Show($"Bem-vindo(a), {res.Usuario.Nome}!\nPapel: {res.Usuario.Papel}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    // TODO: Redirect to professor/admin dashboard
+                    (this.FindForm() as MainForm)?.LoadControl(new UcReinos());
                 }
             }
             catch (TronusDesktop.Services.ApiException ex)
