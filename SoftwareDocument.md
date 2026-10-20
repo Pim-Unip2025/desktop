@@ -115,10 +115,24 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
   - Fases com estrelas conquistadas (`★`) e pendentes (`☆`).
   - Regra de desbloqueio sequencial e botão de ação direta para o `UcQuiz`.
 
-### 3.6 `UcDashboard.cs` (Painel de Desempenho)
-- Painel de análise individual do aluno com dimensionamento fluido de cards e botão voltar alinhado à direita.
-- Apresenta métricas consolidadas, total de estrelas acumuladas, título honorífico (Plebeu a Rei) e taxa percentual de acertos.
-- Botão "Voltar ao Mapa" para retorno ágil a `UcReinos`.
+### 3.6 `UcDashboard.cs` (Painel de Desempenho e Métricas do Herói)
+- Central de análise analítica e pedagógica individual do estudante no Desktop, espelhando a riqueza de dados da versão web com padrão visual Dark Fantasy.
+- **HUD Superior Dedicado:** Título temático, subtítulo contextual e botão de retorno direto "← Voltar ao Mapa" posicionado dinamicamente à direita.
+- **Seção 1: Resumo Geral do Herói (5 Cards de KPIs):**
+  - Painéis `TronusPanel` translúcidos com borda dourada:
+    - 📝 **Questões:** Total de desafios respondidos.
+    - 🎯 **Acertos:** Total de respostas corretas confirmadas.
+    - 📈 **Taxa Geral:** Aproveitamento percentual global em verde esmeralda.
+    - ⭐ **Estrelas:** Total acumulado em todos os reinos.
+    - 👑 **Fases 3★:** Fases com maestria absoluta (100% de aproveitamento).
+- **Seção 2: Gráfico de Barras Customizado por Reino:**
+  - Desenhado via GDI+ com suavização AntiAlias no evento `OnPaint`.
+  - Exibe colunas proporcionais com preenchimento em gradiente vertical dourado/verde para cada matéria (Python, C++, Engenharia de Software, Banco de Dados e Redes).
+  - Inclui taxa percentual no topo de cada coluna, linha de base estilizada e rótulos das disciplinas.
+- **Seção 3: Detalhamento de Desafios por Fase:**
+  - Tabela com colunas: *Reino*, *Fase / Desafio*, *Respostas*, *Aproveitamento*, *Progresso Visual* e *Estrelas Conquistadas*.
+  - Renderiza barras horizontais de progresso e insígnias nobiliárquicas (`★★★`, `★★☆`, `★☆☆`).
+- **Integração e Resiliência:** Consome `GET /personagens/me/resumo` da API e dispõe de baseline acadêmico realista caso o estudante seja um calouro sem histórico.
 
 ### 3.7 `UcQuiz.cs` (Desafio / Quiz da Fase)
 - Núcleo da experiência gamificada de aprendizado do Tronus no Desktop.
