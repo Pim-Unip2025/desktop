@@ -6,15 +6,29 @@ Aplicação desktop oficial da plataforma gamificada **Tronus**, desenvolvida em
 
 ## 📌 Sumário
 
-1. [Visão Geral & Arquitetura](#-visão-geral--arquitetura)
-2. [Estrutura do Projeto](#-estrutura-do-projeto)
-3. [Design System & Identidade Visual](#-design-system--identidade-visual)
-4. [Camada de Serviços & Comunicação HTTP](#-camada-de-serviços--comunicação-http)
-5. [Telas & Fluxo de Navegação (Views)](#-telas--fluxo-de-navegação-views)
-6. [Modelos de Dados (DTOs)](#-modelos-de-dados-dtos)
-7. [Pré-requisitos & Como Executar](#-pré-requisitos--como-executar)
-8. [Roteiro de Testes e Validação](#-roteiro-de-testes-e-validação)
-9. [Credenciais de Homologação](#-credenciais-de-homologação)
+1. [Documentação e Artefatos do Projeto](#-documentação-e-artefatos-do-projeto)
+2. [Visão Geral & Arquitetura](#-visão-geral--arquitetura)
+3. [Estrutura do Projeto](#-estrutura-do-projeto)
+4. [Design System & Identidade Visual](#-design-system--identidade-visual)
+5. [Camada de Serviços & Comunicação HTTP](#-camada-de-serviços--comunicação-http)
+6. [Telas & Fluxo de Navegação (Views)](#-telas--fluxo-de-navegação-views)
+7. [Modelos de Dados (DTOs)](#-modelos-de-dados-dtos)
+8. [Pré-requisitos & Como Executar](#-pré-requisitos--como-executar)
+9. [Roteiro de Testes e Validação](#-roteiro-de-testes-e-validação)
+10. [Credenciais de Homologação](#-credenciais-de-homologação)
+
+---
+
+## 📚 Documentação e Artefatos do Projeto
+
+Abaixo estão os links de acesso direto aos artefatos de modelagem, arquitetura e documentação técnica da aplicação desktop:
+
+| Artefato / Documento | Link de Acesso | Descrição e Finalidade Acadêmica |
+| :--- | :---: | :--- |
+| 📖 **Documentação do Software** | [**`SoftwareDocument.md`**](SoftwareDocument.md) | Especificação técnica completa da aplicação desktop: arquitetura Thin Client, consumo de APIs, modelos de dados, componentes visuais, tratamento de erros e ciclo de vida. |
+| 🏛️ **Diagrama de Classes (UML)** | [**`DiagramaDeClasses.md`**](DiagramaDeClasses.md) | Modelagem estática do domínio com entidades, DTOs, métodos, atributos, relacionamentos em Mermaid e tutorial passo a passo para o software **Astah UML**. |
+| 📐 **Diagrama de Casos de Uso (UML)** | [**`DiagramaDeCasosDeUso.md`**](DiagramaDeCasosDeUso.md) | Modelagem funcional com atores (Aluno, Professor, Administrador, Sistema), diagramas por pacote, dependências (`<<include>>`/`<<extend>>`) e matriz de rastreabilidade dos requisitos (RF01 a RF15). |
+| 📘 **Manual do Usuário** | [**`ManualDoUsuario.md`**](ManualDoUsuario.md) | Guia ilustrado passo a passo para o usuário final em 12 capítulos, cobrindo instalação, atalhos, navegação por todas as telas e solução de dúvidas frequentes. |
 
 ---
 
@@ -56,11 +70,16 @@ graph TD
 
 ```
 TronusDesktop/
+├── DiagramaDeCasosDeUso.md     # Modelagem de Casos de Uso e Matriz RF01-RF15
+├── DiagramaDeClasses.md        # Modelagem de Classes e Guia Astah UML
+├── ManualDoUsuario.md          # Manual de Instruções e Uso da Aplicação
+├── SoftwareDocument.md         # Documentação de Arquitetura e Engenharia de Software
 ├── Models/                     # DTOs de envio e resposta da API
 │   ├── ApiErrorResponse.cs     # Mapeamento de erros padronizados da API
 │   ├── AuthModels.cs           # Login, Registro, Recuperação e Dados do Usuário
 │   ├── DashboardModels.cs      # Estatísticas, KPIs e histórico de respostas
 │   ├── PersonagemModels.cs     # Criação e perfil do herói
+│   ├── QuizModels.cs           # Questões, alternativas e envio de gabarito
 │   └── ReinoModels.cs          # Matérias/Reinos e progresso por fases
 ├── Services/                   # Comunicação e infraestrutura
 │   ├── ApiException.cs         # Exceção customizada com códigos e mensagens da API
@@ -72,11 +91,16 @@ TronusDesktop/
 │   └── TronusPanel.cs          # Card medieval translúcido com borda dourada
 ├── Views/                      # Telas (UserControls) do sistema
 │   ├── UcLanding.cs            # Tela de boas-vindas / Hero
-│   ├── UcLogin.cs              # Autenticação de usuários
+│   ├── UcLogin.cs              # Autenticação de usuários com roteamento por papel
+│   ├── UcForgotPassword.cs     # Recuperação de senha em 3 etapas (SMS)
 │   ├── UcRegister.cs           # Cadastro de novo estudante
 │   ├── UcCharacter.cs          # Seleção de gênero e escolha de avatar
-│   ├── UcReinos.cs             # Mapa dos 5 reinos e fases
-│   └── UcDashboard.cs          # Painel de desempenho e análise de métricas
+│   ├── UcReinos.cs             # Mapa dos 5 reinos e fases com HUD do herói
+│   ├── UcQuiz.cs               # Desafios de combate com 5 questões pedagógicas
+│   ├── UcDashboard.cs          # Painel analítico com KPIs, gráfico por reino e tabela
+│   ├── UcRanking.cs            # Hall dos heróis com pódio e classificação geral
+│   ├── UcProfessor.cs          # Portal do professor (questões e busca de alunos)
+│   └── UcAdmin.cs              # Painel administrativo de governança global
 ├── MainForm.cs                 # Formulário principal sem bordas (Container SPA)
 ├── Program.cs                  # Ponto de entrada do executável Windows
 └── TronusDesktop.csproj        # Configuração do projeto (.NET 10, Windows Forms)
