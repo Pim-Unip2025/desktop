@@ -28,6 +28,7 @@ Abaixo estão os links de acesso direto aos artefatos de modelagem, arquitetura 
 | 📖 **Documentação do Software** | [**`SoftwareDocument.md`**](SoftwareDocument.md) | Especificação técnica completa da aplicação desktop: arquitetura Thin Client, consumo de APIs, modelos de dados, componentes visuais, tratamento de erros e ciclo de vida. |
 | 🏛️ **Diagrama de Classes (UML)** | [**`DiagramaDeClasses.md`**](DiagramaDeClasses.md) | Modelagem estática do domínio com entidades, DTOs, métodos, atributos, relacionamentos em Mermaid e tutorial passo a passo para o software **Astah UML**. |
 | 📐 **Diagrama de Casos de Uso (UML)** | [**`DiagramaDeCasosDeUso.md`**](DiagramaDeCasosDeUso.md) | Modelagem funcional com atores (Aluno, Professor, Administrador, Sistema), diagramas por pacote, dependências (`<<include>>`/`<<extend>>`) e matriz de rastreabilidade dos requisitos (RF01 a RF15). |
+| 🔄 **Diagramas de Sequência (UML)** | [**`DiagramaDeSequencia.md`**](DiagramaDeSequencia.md) | Modelagem comportamental e dinâmica com 11 diagramas de sequência cobrindo todas as telas, lifelines, tabelas de mensagens, regras de negócio e arquivos **Astah UML (`.asta` e `.astah`)**. |
 | 📘 **Manual do Usuário** | [**`ManualDoUsuario.md`**](ManualDoUsuario.md) | Guia ilustrado passo a passo para o usuário final em 12 capítulos, cobrindo instalação, atalhos, navegação por todas as telas e solução de dúvidas frequentes. |
 
 ---
@@ -72,6 +73,9 @@ graph TD
 TronusDesktop/
 ├── DiagramaDeCasosDeUso.md     # Modelagem de Casos de Uso e Matriz RF01-RF15
 ├── DiagramaDeClasses.md        # Modelagem de Classes e Guia Astah UML
+├── DiagramaDeSequencia.md      # Modelagem Dinâmica dos 11 Diagramas de Sequência
+├── DiagramasDeSequencia.asta   # Projeto Astah Oficial com os 11 Diagramas de Sequência
+├── DiagramasDeSequencia.astah  # Cópia no formato .astah solicitada para entrega
 ├── ManualDoUsuario.md          # Manual de Instruções e Uso da Aplicação
 ├── SoftwareDocument.md         # Documentação de Arquitetura e Engenharia de Software
 ├── Models/                     # DTOs de envio e resposta da API

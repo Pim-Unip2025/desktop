@@ -276,6 +276,13 @@ A modelagem estrutural das entidades de negócio foi documentada em `DiagramaDeC
 - **Arquitetura Desktop C#:** Diagrama das classes de apresentação (`MainForm`, `UserControls`) e serviços (`ApiService`, `SessionManager`).
 - **Guia Prático Astah:** Instruções passo a passo de como desenhar e exportar o diagrama a partir do Astah UML.
 
+### 7.3 Modelagem UML — Diagramas de Sequência (`DiagramaDeSequencia.md`)
+A dinâmica temporal de troca de mensagens entre telas, serviços e persistência foi formalmente documentada em `DiagramaDeSequencia.md` (e em `docs/DiagramaDeSequencia.md`), acompanhada de arquivos Astah nativos (`DiagramasDeSequencia.asta` e `DiagramasDeSequencia.astah`):
+- **11 Diagramas de Sequência por Tela:** Mapeamento integral de todas as telas do sistema (Landing, Login, Registro, Recuperação de Senha, Forja do Herói, Mapa dos Reinos, Quiz Gamificado, Dashboard, Ranking, Painel do Professor e Painel do Administrador).
+- **Linhas de Vida (Lifelines):** Interação desacoplada entre Atores, `UserControls`, `MainForm`, `ApiService`, `SessionManager`, Endpoints REST da API e banco de dados com triggers automáticas.
+- **Rastreabilidade e Regras de Negócio:** Especificação de mensagens síncronas/assíncronas, blocos alternativos (`alt`/`opt`), disparos de triggers (`trg_calcular_estrelas`) e retornos padronizados.
+- **Arquivos Astah Integrados:** Disponibilizados em `docs/DiagramasDeSequencia.asta`, `docs/DiagramasDeSequencia.astah` e incorporados ao arquivo mestre `docs/Engenharia de software ágil aplicada.asta`.
+
 ---
 
 ## 8. Status do Roadmap de Desenvolvimento
@@ -296,4 +303,6 @@ A modelagem estrutural das entidades de negócio foi documentada em `DiagramaDeC
 - [x] Manual de Uso Completo do Aluno e Avaliador (`ManualDoUsuario.md`).
 - [x] Modelagem UML e Matriz de Rastreabilidade de Casos de Uso (`DiagramaDeCasosDeUso.md`).
 - [x] Modelagem UML e Dicionário de Classes do Domínio (`DiagramaDeClasses.md`).
+- [x] Modelagem UML dos 11 Diagramas de Sequência por Tela (`DiagramaDeSequencia.md`, `.asta` e `.astah`).
 - [x] Exclusão de redundâncias no `.csproj` para compilação limpa com 0 erros.
+
