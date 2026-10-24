@@ -120,10 +120,13 @@ namespace TronusDesktop.UI
             {
                 root.BackColor = Background;
 
-                string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
+                string bgPath = (root.GetType().Name == "UcLanding")
+                    ? Path.Combine(Application.StartupPath, "img", "hero.png")
+                    : Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
+
                 if (IsDarkMode && File.Exists(bgPath))
                 {
-                    if (root.BackgroundImage == null && root.Tag?.ToString() != "no_bg")
+                    if (root.Tag?.ToString() != "no_bg")
                     {
                         try
                         {
@@ -150,16 +153,25 @@ namespace TronusDesktop.UI
             }
             else if (root is Label lbl)
             {
-                // Mapeia estilos originais de títulos e subtítulos
-                if (lbl.Font.Bold || lbl.ForeColor == Color.FromArgb(212, 175, 55) || lbl.ForeColor == Color.FromArgb(170, 120, 15))
+                // Mapeia títulos em ouro e textos secundários/primários
+                if (lbl.Tag?.ToString() == "gold" || lbl.ForeColor == Color.FromArgb(212, 175, 55) || lbl.ForeColor == Color.FromArgb(170, 120, 15))
                 {
                     lbl.ForeColor = Gold;
                 }
-                else if (lbl.ForeColor == Color.FromArgb(168, 144, 96) || lbl.ForeColor == Color.FromArgb(100, 80, 60))
+                else if (lbl.Tag?.ToString() == "dim" || lbl.ForeColor == Color.FromArgb(168, 144, 96) || lbl.ForeColor == Color.FromArgb(100, 80, 60))
                 {
                     lbl.ForeColor = DimText;
                 }
-                else if (lbl.ForeColor == Color.FromArgb(240, 230, 200) || lbl.ForeColor == Color.White || lbl.ForeColor == Color.FromArgb(28, 25, 22))
+                else if (lbl.ForeColor == Color.FromArgb(240, 230, 200) || lbl.ForeColor == Color.White || lbl.ForeColor == Color.FromArgb(28, 25, 22) || lbl.ForeColor == Color.FromArgb(235, 230, 215))
+                {
+                    lbl.ForeColor = PrimaryText;
+                }
+                else if (!IsDarkMode && (lbl.ForeColor.R > 200 && lbl.ForeColor.G > 200 && lbl.ForeColor.B > 200))
+                {
+                    // Qualquer texto claro remanescente em modo claro recebe alto contraste
+                    lbl.ForeColor = PrimaryText;
+                }
+                else if (IsDarkMode && (lbl.ForeColor == Color.FromArgb(28, 25, 22) || lbl.ForeColor == Color.Black))
                 {
                     lbl.ForeColor = PrimaryText;
                 }

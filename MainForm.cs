@@ -94,9 +94,10 @@ namespace TronusDesktop
             var windowButtonsPanel = new FlowLayoutPanel
             {
                 Dock = DockStyle.Right,
-                Width = 275,
+                Width = 285,
                 Height = 40,
                 FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false,
                 BackColor = Color.Transparent,
                 Margin = new Padding(0),
                 Padding = new Padding(0)
@@ -105,7 +106,8 @@ namespace TronusDesktop
             // Botão de Acessibilidade (Modo Claro / Modo Escuro)
             btnTheme = new AccessibilityThemeButton
             {
-                Margin = new Padding(0, 5, 10, 5)
+                Size = new Size(130, 30),
+                Margin = new Padding(0, 5, 8, 5)
             };
 
             // Botão Minimizar

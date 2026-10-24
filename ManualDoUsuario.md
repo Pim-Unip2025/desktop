@@ -75,9 +75,17 @@ No canto superior direito da barra de título, você encontra os botões de cont
 
 | Botão | Ícone | Ação Realizada |
 | :--- | :---: | :--- |
+| **Acessibilidade (Tema)** | `☀️ / 🌙` | Alterna instantaneamente entre o **Modo Escuro Medieval** e o **Modo Claro de Alto Contraste (Pergaminho)**. Presente na barra superior e em todas as telas do sistema. |
 | **Minimizar** | `—` | Reduz a janela para a barra de tarefas do Windows. |
 | **Maximizar / Restaurar** | `🗖` ou `🗗` | Alterna instantaneamente entre o modo janela e o modo tela cheia inteligente. |
 | **Fechar** | `✕` | Encerra com segurança o aplicativo. Fica vermelho ao passar o mouse. |
+
+### ☀️ Acessibilidade Visual: Modo Claro e Modo Escuro
+O Tronus Desktop disponibiliza um recurso completo de acessibilidade visual projetado para atender aos critérios de legibilidade e alto contraste **WCAG AAA**:
+* **Botão Contextual em Todas as Telas:** O botão em formato de pílula estilizada está presente no cabeçalho fixo da janela e diretamente no topo de cada uma das telas (Boas-vindas, Login, Cadastro, Recuperação de Senha, Mapa dos Reinos, Desempenho, Ranking, Portal do Professor e Painel do Administrador).
+* **Ícones Vetoriais Nativos (GDI+):** O botão desenha um Sol dourado nítido para convidar à ativação do Modo Claro e uma Lua Crescente refinada para o retorno ao Modo Escuro, sem risco de falha ou incompatibilidade de fontes do Windows.
+* **Paleta Pergaminho Acessível:** Ao alternar para o Modo Claro, o aplicativo remove os papéis de parede escuros e adota uma paleta em marfim suave (`#F4F1EA`) com tipografia em carvão profundo (`#1C1916`) e detalhes em ouro envelhecido (`#AA780F`), proporcionando máxima clareza em salas de aula iluminadas ou para usuários com sensibilidade visual.
+* **Atalho Global pelo Teclado:** A qualquer momento, pressione **`Ctrl + T`** ou **`Alt + A`** para alternar entre os temas sem precisar usar o mouse.
 
 > **Dicas de Produtividade:**
 > * **Clique Duplo:** Dê um duplo clique na barra de título dourada para alternar rapidamente entre maximizar e restaurar.

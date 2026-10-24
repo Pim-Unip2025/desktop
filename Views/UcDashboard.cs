@@ -17,6 +17,7 @@ namespace TronusDesktop.Views
         private Label lblTitulo;
         private Label lblSubtitulo;
         private TronusButton btnVoltar;
+        private AccessibilityThemeButton btnTheme;
 
         private Panel mainScrollContainer;
         private FlowLayoutPanel flowKpis;
@@ -86,17 +87,20 @@ namespace TronusDesktop.Views
         {
             this.BackColor = Theme.Background;
             string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-            if (File.Exists(bgPath))
+            if (Theme.IsDarkMode && File.Exists(bgPath))
             {
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
 
-            // Camada escura suave sobre o fundo
+            // Camada escura suave sobre o fundo apenas no Modo Escuro
             this.Paint += (s, e) =>
             {
-                using var brush = new SolidBrush(Color.FromArgb(160, 15, 12, 10));
-                e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                if (Theme.IsDarkMode)
+                {
+                    using var brush = new SolidBrush(Color.FromArgb(160, 15, 12, 10));
+                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                }
             };
 
             // ═══════════════════════════════════════════════════
@@ -106,7 +110,7 @@ namespace TronusDesktop.Views
             {
                 Dock = DockStyle.Top,
                 Height = 75,
-                BackColor = Color.FromArgb(220, 15, 12, 10)
+                BackColor = Theme.TopBarBackground
             };
             topHudPanel.Paint += (s, e) =>
             {
@@ -146,13 +150,28 @@ namespace TronusDesktop.Views
             btnVoltar.Click += (s, e) => (this.FindForm() as MainForm)?.LoadControl(new UcReinos());
             topHudPanel.Controls.Add(btnVoltar);
 
-            topHudPanel.Resize += (s, e) =>
+            // Botão de acessibilidade contextual no HUD do Dashboard
+            btnTheme = new AccessibilityThemeButton
             {
-                if (btnVoltar != null)
+                Size = new Size(130, 30),
+                Location = new Point(675, 22)
+            };
+            topHudPanel.Controls.Add(btnTheme);
+
+            void ReposDashboardButtons()
+            {
+                if (btnVoltar != null && topHudPanel != null)
                 {
                     btnVoltar.Location = new Point(topHudPanel.Width - btnVoltar.Width - 25, 17);
+                    if (btnTheme != null)
+                    {
+                        btnTheme.Location = new Point(btnVoltar.Left - btnTheme.Width - 12, 22);
+                    }
                 }
-            };
+            }
+
+            topHudPanel.Resize += (s, e) => ReposDashboardButtons();
+            ReposDashboardButtons();
 
             // ═══════════════════════════════════════════════════
             // CONTAINER PRINCIPAL (SCROLLABLE)

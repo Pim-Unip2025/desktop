@@ -42,6 +42,7 @@ namespace TronusDesktop.Views
         // Estado do fluxo
         private string codigoGerado = "";
         private string celularInformado = "";
+        private AccessibilityThemeButton btnTheme;
 
         public UcForgotPassword()
         {
@@ -61,18 +62,30 @@ namespace TronusDesktop.Views
         {
             this.BackColor = Theme.Background;
             string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-            if (File.Exists(bgPath))
+            if (Theme.IsDarkMode && File.Exists(bgPath))
             {
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
 
-            // Camada escura sobre o fundo para manter o padrão Dark Fantasy
+            // Camada escura sobre o fundo apenas no Modo Escuro para manter o padrão Dark Fantasy
             this.Paint += (s, e) =>
             {
-                using var brush = new SolidBrush(Color.FromArgb(140, 15, 12, 10));
-                e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                if (Theme.IsDarkMode)
+                {
+                    using var brush = new SolidBrush(Color.FromArgb(140, 15, 12, 10));
+                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                }
             };
+
+            // Botão de acessibilidade contextual na tela de recuperação
+            btnTheme = new AccessibilityThemeButton
+            {
+                Size = new Size(130, 30),
+                Location = new Point(Math.Max(500, this.Width - 160), 20),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            this.Controls.Add(btnTheme);
 
             forgotCard = new TronusPanel
             {

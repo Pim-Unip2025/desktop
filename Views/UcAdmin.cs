@@ -16,6 +16,7 @@ namespace TronusDesktop.Views
         private Label lblTitulo;
         private Label lblSubtitulo;
         private TronusButton btnLogout;
+        private AccessibilityThemeButton btnTheme;
 
         private Panel mainScrollContainer;
         private FlowLayoutPanel flowKpis;
@@ -65,7 +66,7 @@ namespace TronusDesktop.Views
         {
             this.BackColor = Theme.Background;
             string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-            if (File.Exists(bgPath))
+            if (Theme.IsDarkMode && File.Exists(bgPath))
             {
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
@@ -73,8 +74,11 @@ namespace TronusDesktop.Views
 
             this.Paint += (s, e) =>
             {
-                using var brush = new SolidBrush(Color.FromArgb(165, 15, 12, 10));
-                e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                if (Theme.IsDarkMode)
+                {
+                    using var brush = new SolidBrush(Color.FromArgb(165, 15, 12, 10));
+                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                }
             };
 
             // ═══════════════════════════════════════════════════
@@ -84,7 +88,7 @@ namespace TronusDesktop.Views
             {
                 Dock = DockStyle.Top,
                 Height = 75,
-                BackColor = Color.FromArgb(220, 15, 12, 10)
+                BackColor = Theme.TopBarBackground
             };
             topHudPanel.Paint += (s, e) =>
             {
@@ -133,13 +137,28 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
-            topHudPanel.Resize += (s, e) =>
+            // Botão de acessibilidade contextual no HUD do Administrador
+            btnTheme = new AccessibilityThemeButton
             {
-                if (btnLogout != null)
+                Size = new Size(130, 30),
+                Location = new Point(715, 22)
+            };
+            topHudPanel.Controls.Add(btnTheme);
+
+            void ReposAdminButtons()
+            {
+                if (btnLogout != null && topHudPanel != null)
                 {
                     btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
+                    if (btnTheme != null)
+                    {
+                        btnTheme.Location = new Point(btnLogout.Left - btnTheme.Width - 12, 22);
+                    }
                 }
-            };
+            }
+
+            topHudPanel.Resize += (s, e) => ReposAdminButtons();
+            ReposAdminButtons();
 
             // ═══════════════════════════════════════════════════
             // CONTAINER PRINCIPAL (SCROLLABLE)

@@ -105,7 +105,7 @@ TronusDesktop/
 │   ├── TronusButton.cs         # Botão customizado com cantos arredondados e hover
 │   ├── TronusPanel.cs          # Card medieval translúcido com borda dourada
 │   ├── PasswordToggleButton.cs # Botão vetorial GDI+ para alternar visibilidade de senhas
-│   └── AccessibilityThemeButton.cs # Botão de acessibilidade Modo Claro / Modo Escuro com atalho Ctrl+T
+│   └── AccessibilityThemeButton.cs # Botão de acessibilidade vetorial GDI+ presente em todas as telas (Modo Claro / Modo Escuro, atalhos Ctrl+T / Alt+A)
 ├── Views/                      # Telas (UserControls) do sistema
 │   ├── UcLanding.cs            # Tela de boas-vindas / Hero
 │   ├── UcLogin.cs              # Autenticação de usuários com roteamento por papel

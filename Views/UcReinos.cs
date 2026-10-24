@@ -25,6 +25,7 @@ namespace TronusDesktop.Views
         private TronusButton btnRanking;
         private TronusButton btnDashboard;
         private TronusButton btnLogout;
+        private AccessibilityThemeButton btnTheme;
 
         // Cabeçalho da página
         private TronusPanel headerCard;
@@ -64,17 +65,20 @@ namespace TronusDesktop.Views
             this.BackColor = Theme.Background;
 
             string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-            if (File.Exists(bgPath))
+            if (Theme.IsDarkMode && File.Exists(bgPath))
             {
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
 
-            // Suave camada escura sobre o mapa para dar a atmosfera medieval e garantir excelente contraste
+            // Suave camada escura sobre o mapa apenas no Modo Escuro
             this.Paint += (s, e) =>
             {
-                using var brush = new SolidBrush(Color.FromArgb(90, 15, 12, 10));
-                e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                if (Theme.IsDarkMode)
+                {
+                    using var brush = new SolidBrush(Color.FromArgb(90, 15, 12, 10));
+                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                }
             };
 
             // ═══════════════════════════════════════════════════
@@ -84,7 +88,7 @@ namespace TronusDesktop.Views
             {
                 Dock = DockStyle.Top,
                 Height = 75,
-                BackColor = Color.FromArgb(220, 15, 12, 10)
+                BackColor = Theme.TopBarBackground
             };
             topHudPanel.Paint += (s, e) =>
             {
@@ -207,6 +211,14 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
+            // Botão de acessibilidade contextual no HUD dos Reinos
+            btnTheme = new AccessibilityThemeButton
+            {
+                Size = new Size(130, 30),
+                Location = new Point(440, 22)
+            };
+            topHudPanel.Controls.Add(btnTheme);
+
             topHudPanel.Resize += (s, e) => RepositionHudButtons();
             RepositionHudButtons();
 
@@ -284,6 +296,10 @@ namespace TronusDesktop.Views
                 if (btnRanking != null)
                 {
                     btnRanking.Location = new Point(btnDashboard.Left - btnRanking.Width - 10, 18);
+                    if (btnTheme != null)
+                    {
+                        btnTheme.Location = new Point(btnRanking.Left - btnTheme.Width - 12, 22);
+                    }
                 }
             }
         }

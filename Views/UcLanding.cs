@@ -8,6 +8,7 @@ namespace TronusDesktop.Views
 {
     public partial class UcLanding : UserControl
     {
+        private AccessibilityThemeButton btnTheme;
         private Label tagLabel;
         private PictureBox logoBox;
         private Label subtitleLabel;
@@ -26,7 +27,7 @@ namespace TronusDesktop.Views
             this.BackColor = Theme.Background;
 
             string heroPath = Path.Combine(Application.StartupPath, "img", "hero.png");
-            if (File.Exists(heroPath))
+            if (Theme.IsDarkMode && File.Exists(heroPath))
             {
                 this.BackgroundImage = Image.FromFile(heroPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
@@ -34,17 +35,27 @@ namespace TronusDesktop.Views
 
             this.Paint += (s, e) =>
             {
-                int gradientWidth = this.Width / 2 + 150;
-                using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
-                    new Point(0, 0), new Point(gradientWidth, 0),
-                    Color.FromArgb(240, 10, 10, 10), Color.Transparent))
+                if (Theme.IsDarkMode)
                 {
-                    // Apenas desenha até o ponto em que o gradiente fica transparente,
-                    // evitando que a classe repita o gradiente do lado direito.
-                    e.Graphics.FillRectangle(brush, new Rectangle(0, 0, gradientWidth, this.Height));
+                    int gradientWidth = this.Width / 2 + 150;
+                    using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
+                        new Point(0, 0), new Point(gradientWidth, 0),
+                        Color.FromArgb(240, 10, 10, 10), Color.Transparent))
+                    {
+                        e.Graphics.FillRectangle(brush, new Rectangle(0, 0, gradientWidth, this.Height));
+                    }
                 }
             };
             this.Resize += (s, e) => this.Invalidate();
+
+            // Botão de acessibilidade contextual na tela inicial
+            btnTheme = new AccessibilityThemeButton
+            {
+                Size = new Size(130, 30),
+                Location = new Point(Math.Max(500, this.Width - 160), 25),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            this.Controls.Add(btnTheme);
 
             tagLabel = new Label
             {
@@ -87,7 +98,7 @@ namespace TronusDesktop.Views
             descLabel = new Label
             {
                 Text = "Sua jornada rumo ao título de REI começa aqui. Enfrente os desafios das matérias-reinos e forje seu futuro.",
-                ForeColor = Color.White,
+                ForeColor = Theme.PrimaryText,
                 Font = new Font("Segoe UI", 12F, FontStyle.Regular),
                 AutoSize = true,
                 MaximumSize = new Size(450, 0),

@@ -8,6 +8,7 @@ namespace TronusDesktop.Views
 {
     public partial class UcLogin : UserControl
     {
+        private AccessibilityThemeButton btnTheme;
         private TronusPanel loginCard;
         private Label titleLabel;
         private Label emailLabel;
@@ -32,11 +33,20 @@ namespace TronusDesktop.Views
         {
             this.BackColor = Theme.Background;
             string bgPath = Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-            if (File.Exists(bgPath))
+            if (Theme.IsDarkMode && File.Exists(bgPath))
             {
                 this.BackgroundImage = Image.FromFile(bgPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
             }
+
+            // Botão de acessibilidade contextual na tela de login
+            btnTheme = new AccessibilityThemeButton
+            {
+                Size = new Size(130, 30),
+                Location = new Point(Math.Max(500, this.Width - 160), 20),
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            this.Controls.Add(btnTheme);
 
             loginCard = new TronusPanel
             {
