@@ -86,6 +86,11 @@ graph LR
     AdminAPI --> MySQL
 ```
 
+> 🌐 **Protocolos de Transporte e Portas de Rede nos Diagramas de Sequência:**
+> - **Porta 443 (HTTPS / TLS 1.2 e 1.3):** Todas as mensagens síncronas/assíncronas trocadas entre o cliente desktop (`API: ApiService`) e a API central na nuvem (`SRV: Backend API`) trafegam obrigatoriamente pela **porta 443 (TCP)** com criptografia de ponta a ponta.
+> - **Porta 3000 (HTTP):** Utilizada exclusivamente em ambiente de desenvolvimento local para depuração dos endpoints da API.
+> - **Portas 5432 / 6543 (PostgreSQL / Pooler):** Camada interna de banco de dados entre a API e o Supabase na nuvem, isolada da rede pública e inacessível diretamente pelo cliente.
+
 ---
 
 ## 3. Dicionário de Linhas de Vida (Lifelines) e Participantes

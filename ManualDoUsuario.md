@@ -251,6 +251,10 @@ Para sair da sua conta ou permitir que outro estudante utilize o mesmo computado
 * **Causa:** O computador está sem acesso à internet ou o firewall institucional está bloqueando conexões HTTPS externas.
 * **Solução:** Verifique sua conexão com a internet. O Tronus Desktop consome a API central na nuvem (`https://king-blue-nine.vercel.app`). Certifique-se de que o tráfego HTTPS na porta 443 esteja liberado.
 
+### ❓ Quais portas de rede e permissões de firewall são necessárias para o Tronus Desktop?
+* **Porta de Saída Obrigatória:** O Tronus Desktop necessita exclusivamente da **porta 443 (TCP / HTTPS)** liberada para tráfego de saída (Outbound) em direção ao domínio `king-blue-nine.vercel.app`.
+* **Ambiente Acadêmico e Laboratórios:** Por utilizar a porta padrão mundial de navegação web criptografada (HTTPS 443), o aplicativo opera normalmente em redes corporativas, laboratórios universitários e redes Wi-Fi públicas sem exigir abertura de portas arbitrárias ou permissões de administrador.
+
 ### ❓ Minha sessão foi finalizada e o sistema voltou para a tela de login.
 * **Causa:** Por motivos de segurança bancária e acadêmica, os tokens de acesso possuem validade temporária de 1 hora.
 * **Solução:** Isso é normal. Basta digitar sua senha novamente na tela de login para renovar a sessão.

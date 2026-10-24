@@ -226,6 +226,21 @@ Mantém as credenciais e o perfil do usuário logado durante o ciclo de vida da 
 - `QuizModels.cs`: `QuestaoDto`, `AlternativaDto`, `EnviarRespostasRequest`, `ItemRespostaRequest`, `ResultadoQuizResponse`, `ItemCorrecaoDto`.
 - `ApiErrorResponse.cs`: Formato padrão de erro do NestJS (`statusCode`, `message`, `error`).
 
+### 4.4 Topologia de Rede, Protocolos e Portas Utilizadas no Envio à API
+A aplicação Desktop atua como cliente HTTP e conecta-se à infraestrutura de serviços através das portas e protocolos abaixo:
+
+| Porta | Protocolo | Camada / Transporte | Origem (Cliente) | Destino (Servidor) | Finalidade e Descrição |
+|:---:|:---:|:---:|:---:|:---:|---|
+| **443** | **HTTPS (TLS 1.2 / 1.3)** | TCP | Tronus Desktop (`ApiService.cs`) | `king-blue-nine.vercel.app` (Vercel Cloud) | **Porta Oficial de Produção:** Todas as requisições REST da aplicação cliente (Login, Registro, Recuperação de Senha, Reinos, Quizzes, Ranking e Dashboard) trafegam criptografadas pela porta 443 padrão da Web segura. |
+| **3000** | **HTTP** | TCP | Tronus Desktop / Navegador | `localhost:3000` (Node.js / NestJS) | **Porta de Desenvolvimento Local:** Utilizada para execução e depuração local da API pelo time de engenharia sem necessidade de deploy na nuvem. |
+| **5500** | **HTTP** | TCP | Navegador Web | `127.0.0.1:5500` (VS Code Live Server) | **Porta da Interface Web de Apoio:** Servidor HTTP local para homologação dos arquivos estáticos (`index.html`, `login.html`, `reinos.html`). |
+| **5432** | **PostgreSQL Nativo** | TCP | API NestJS (Backend) | `aws-0-sa-east-1.pooler.supabase.com` | **Porta de Persistência Direta:** Conexão direta SQL entre a API central e o banco PostgreSQL. *O cliente Desktop não acessa diretamente esta porta.* |
+| **6543** | **PgBouncer Pooler** | TCP | API NestJS (Backend) | `aws-0-sa-east-1.pooler.supabase.com` | **Porta de Pool de Transações:** Gerenciamento escalável de conexões do Supabase em ambientes serverless da API. *O cliente Desktop não acessa diretamente esta porta.* |
+
+#### Requisitos de Infraestrutura e Redes Institucionais (Firewall / Proxy):
+- **Tráfego de Saída (Outbound):** O computador do usuário precisa permitir conexões de saída TCP na **porta 443** direcionadas ao domínio `https://king-blue-nine.vercel.app`.
+- **Compatibilidade com Redes Acadêmicas (UNIP):** Por utilizar estritamente a porta padrão de navegação segura (443), o Tronus Desktop opera transparentemente através de proxies institucionais, firewalls estritos de laboratórios universitários e redes corporativas sem exigir abertura de portas arbitrárias ou privilégios de administrador de rede.
+
 ---
 
 ## 5. Banco de Dados e Backend (PostgreSQL no Supabase)

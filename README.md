@@ -65,6 +65,17 @@ graph TD
 * **Zero Client Calculation:** Regras de negócio como progressão de títulos (Plebeu → Cavaleiro → Duque → Rei), cálculo de estrelas e taxa de acerto são calculadas centralmente pelo banco e API. O cliente desktop consome e exibe essas informações de forma reativa.
 * **Segurança e Sessão Stateless:** Autenticação baseada em tokens JWT. Ao efetuar login, o token é injetado automaticamente nos headers de todas as chamadas protegidas (`Authorization: Bearer <token>`). Se a API retornar `401 Unauthorized`, a sessão é invalidada e o usuário é redirecionado para a tela de autenticação.
 
+### 🌐 Portas de Rede e Comunicação com a API:
+A aplicação desktop consome os serviços da API REST na nuvem através das seguintes portas padronizadas:
+
+| Porta | Protocolo | Origem | Destino | Função Principal |
+|:---:|:---:|:---:|:---:|---|
+| **443** | **HTTPS (TLS 1.2 / 1.3)** | Tronus Desktop | `king-blue-nine.vercel.app` | **Porta Principal de Produção:** Envio criptografado de credenciais, progresso dos reinos, envio de gabaritos e sincronização de dados via Web segura. |
+| **3000** | **HTTP** | Tronus Desktop / Web | `localhost:3000` | **Porta de Homologação Local:** Utilizada para testes locais da API NestJS sem necessidade de deploy. |
+| **5500** | **HTTP** | Navegador Web | `127.0.0.1:5500` | **Porta de Apoio Web:** Live Server do VS Code para os arquivos estáticos HTML5/CSS3. |
+
+> 🔒 **Requisito de Rede:** Para o pleno funcionamento do Tronus Desktop, a rede local (incluindo laboratórios de faculdade da UNIP ou firewalls corporativos) precisa permitir tráfego de saída **TCP na porta 443**.
+
 ---
 
 ## 📂 Estrutura do Projeto
