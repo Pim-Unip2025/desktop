@@ -35,6 +35,13 @@ Componente customizado para alternância e visualização de senhas (`PasswordCh
 - **Interatividade & Acessibilidade:** Suporte a hover com borda dourada, tooltip nativo contextual (*"Ver senha"* / *"Ocultar senha"*), preservação contínua do foco e cursor de edição no `TextBox` associado, e `TabStop = false` para não interromper a navegação por teclado.
 - **Presença em Telas:** Integrado aos campos de senha de `UcLogin` (1 campo), `UcRegister` (2 campos: senha e confirmação) e `UcForgotPassword` (2 campos: nova senha e confirmação).
 
+### 1.5 `AccessibilityThemeButton.cs`
+Componente dedicado para acessibilidade visual e alternância dinâmica de temas:
+- **Alternância Instantânea (Modo Escuro / Modo Claro):** Permite chavear a aplicação entre o clássico *Dark Fantasy* medieval e o *Parchment Acessível* de alto contraste (WCAG AAA), com fundo marfim e tipografia escura de máxima legibilidade.
+- **Posicionamento Universal:** Incorporado diretamente à `TopBar` do `MainForm`, permanecendo permanentemente visível e acessível em 100% das telas da aplicação.
+- **Atalhos de Teclado:** Suporte a acionamento global via teclas de atalho `Ctrl+T` ou `Alt+A` (Acessibilidade).
+- **Tooltips e Feedback:** Tooltips dinâmicos contextuais informando o estado do tema e a ação a ser realizada.
+
 ---
 
 ## 2. Janela Base (A Casca)
@@ -49,10 +56,12 @@ O ponto central do programa (A *Single Page Application* adaptada para o desktop
 - **Barra de Título Customizada (TopBar):**
   - Título estilizado em dourado ("TRONUS — O Caminho do Herói Acadêmico").
   - Fundo escuro sólido (`#12100E`) com divisor inferior dourado fino de 1px.
-  - Três botões de controle de janela com efeitos no hover:
+  - Painel de controles da janela com acessibilidade integrada:
+    - **Botão de Acessibilidade (`AccessibilityThemeButton`):** Alterna instantaneamente entre Modo Claro (`☀️ Modo Claro`) e Modo Escuro (`🌙 Modo Escuro`).
     - **Minimizar (`—`):** Reduz o aplicativo para a barra de tarefas do Windows.
     - **Maximizar / Restaurar (`🗖` / `🗗`):** Alterna suavemente entre o modo janela e o modo maximizado. O ícone se altera automaticamente conforme o estado.
     - **Fechar (`✕`):** Encerra a aplicação com highlight vermelho de perigo.
+  - Suporta atalhos globais de teclado `Ctrl+T` e `Alt+A` para alternância de tema em qualquer tela.
   - Suporta clique duplo na barra de título para alternar entre maximizar e restaurar.
   - Implementa eventos (`MouseDown`, `MouseMove`, `MouseUp`) para permitir arrastar a janela livremente em modo normal.
   - **Hierarquia de Z-Order e Não-Sobreposição:** O `topBar` é configurado com `SendToBack()` antes do `contentPanel` (`DockStyle.Fill`), garantindo que o painel de conteúdo inicie estritamente a partir do pixel vertical Y=40, sem sobrepor ou encobrir os controles superiores dos UserControls.
@@ -294,7 +303,8 @@ A dinâmica temporal de troca de mensagens entre telas, serviços e persistênci
 ## 8. Status do Roadmap de Desenvolvimento
 
 - [x] Arquitetura base SPA com `MainForm` e `LoadControl`.
-- [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`, `PasswordToggleButton`).
+- [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`, `PasswordToggleButton`, `AccessibilityThemeButton`).
+- [x] Botão de acessibilidade de Modo Claro e Modo Escuro funcional em todas as telas com paleta de alto contraste e atalhos globais (`Ctrl+T` / `Alt+A`).
 - [x] Alternância e visualização de senha com feedback visual vetorial (`PasswordToggleButton`) em Login, Registro e Troca de Senha.
 - [x] Auto-ajuste de janela inteligente por resolução (`AutoAjustarAoIniciar`), tela cheia sem cobrir a barra de tarefas (`WM_GETMINMAXINFO`) e controles de janela na barra de título (Minimizar, Maximizar/Restaurar, Fechar).
 - [x] Redimensionamento fluido por arrasto de bordas (`WM_NCHITTEST`) e controles responsivos (`CenterCard` e `AdjustLayout`).

@@ -90,10 +90,11 @@ TronusDesktop/
 │   ├── ApiService.cs           # Singleton HTTP com injeção de JWT e tratamento de erros
 │   └── SessionManager.cs       # Armazenamento em memória da sessão e usuário logado
 ├── UI/                         # Componentes visuais personalizados
-│   ├── Theme.cs                # Paleta de cores, gradientes e constantes visuais
+│   ├── Theme.cs                # Paleta dinâmica de cores, gradientes e gerenciador de acessibilidade
 │   ├── TronusButton.cs         # Botão customizado com cantos arredondados e hover
 │   ├── TronusPanel.cs          # Card medieval translúcido com borda dourada
-│   └── PasswordToggleButton.cs # Botão vetorial GDI+ para alternar visibilidade de senhas
+│   ├── PasswordToggleButton.cs # Botão vetorial GDI+ para alternar visibilidade de senhas
+│   └── AccessibilityThemeButton.cs # Botão de acessibilidade Modo Claro / Modo Escuro com atalho Ctrl+T
 ├── Views/                      # Telas (UserControls) do sistema
 │   ├── UcLanding.cs            # Tela de boas-vindas / Hero
 │   ├── UcLogin.cs              # Autenticação de usuários com roteamento por papel

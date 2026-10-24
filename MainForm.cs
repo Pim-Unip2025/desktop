@@ -27,6 +27,7 @@ namespace TronusDesktop
 
         private Panel topBar;
         private Label titleLabel;
+        private AccessibilityThemeButton btnTheme;
         private Button btnMinimize;
         private Button btnMaximize;
         private Button closeBtn;
@@ -62,7 +63,7 @@ namespace TronusDesktop
             {
                 Height = 40,
                 Dock = DockStyle.Top,
-                BackColor = Color.FromArgb(18, 16, 14)
+                BackColor = Theme.TopBarBackground
             };
             topBar.Paint += (s, e) =>
             {
@@ -89,16 +90,22 @@ namespace TronusDesktop
             titleLabel.DoubleClick += (s, e) => ToggleMaximize();
             topBar.Controls.Add(titleLabel);
 
-            // Container para os botões da janela (Minimizar, Maximizar/Restaurar, Fechar)
+            // Container para os botões da janela e acessibilidade
             var windowButtonsPanel = new FlowLayoutPanel
             {
                 Dock = DockStyle.Right,
-                Width = 135,
+                Width = 275,
                 Height = 40,
                 FlowDirection = FlowDirection.LeftToRight,
                 BackColor = Color.Transparent,
                 Margin = new Padding(0),
                 Padding = new Padding(0)
+            };
+
+            // Botão de Acessibilidade (Modo Claro / Modo Escuro)
+            btnTheme = new AccessibilityThemeButton
+            {
+                Margin = new Padding(0, 5, 10, 5)
             };
 
             // Botão Minimizar
@@ -149,10 +156,13 @@ namespace TronusDesktop
             closeBtn.MouseEnter += (s, e) => closeBtn.BackColor = Color.FromArgb(60, 255, 50, 50);
             closeBtn.MouseLeave += (s, e) => closeBtn.BackColor = Color.Transparent;
 
+            windowButtonsPanel.Controls.Add(btnTheme);
             windowButtonsPanel.Controls.Add(btnMinimize);
             windowButtonsPanel.Controls.Add(btnMaximize);
             windowButtonsPanel.Controls.Add(closeBtn);
             topBar.Controls.Add(windowButtonsPanel);
+
+            Theme.ThemeChanged += OnThemeChanged;
 
             // Painel central hospedeiro dos UserControls
             contentPanel = new Panel
@@ -245,7 +255,34 @@ namespace TronusDesktop
         {
             contentPanel.Controls.Clear();
             uc.Dock = DockStyle.Fill;
+            Theme.ApplyTheme(uc);
             contentPanel.Controls.Add(uc);
+        }
+
+        private void OnThemeChanged()
+        {
+            this.BackColor = Theme.Background;
+            topBar.BackColor = Theme.TopBarBackground;
+            titleLabel.ForeColor = Theme.Gold;
+            btnMinimize.ForeColor = Theme.Gold;
+            btnMaximize.ForeColor = Theme.Gold;
+            closeBtn.ForeColor = Theme.Gold;
+            topBar.Invalidate();
+
+            if (contentPanel.Controls.Count > 0)
+            {
+                Theme.ApplyTheme(contentPanel.Controls[0]);
+            }
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.T) || keyData == (Keys.Alt | Keys.A))
+            {
+                Theme.ToggleTheme();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         /// <summary>

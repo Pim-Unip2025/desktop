@@ -30,7 +30,7 @@ namespace TronusDesktop.UI
             {
                 e.Graphics.FillPath(brush, pathSurface);
             }
-            using (Pen pen = new Pen(Color.FromArgb(20, 255, 255, 255), 1))
+            using (Pen pen = new Pen(Theme.CardBorder, 1))
             {
                 e.Graphics.DrawPath(pen, pathSurface);
             }

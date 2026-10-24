@@ -115,12 +115,13 @@ namespace TronusDesktop.UI
             Graphics g = e.Graphics;
             g.SmoothingMode = SmoothingMode.AntiAlias;
 
-            // Fundo integrado ao tema dos campos de texto escuros
+            // Fundo integrado ao tema dos campos de texto (claro ou escuro)
+            Color baseInputBg = Theme.InputBackground;
             Color bg = _isPressed
-                ? Color.FromArgb(28, 28, 28)
-                : (_isHovered ? Color.FromArgb(52, 52, 52) : Color.FromArgb(40, 40, 40));
+                ? (Theme.IsDarkMode ? Color.FromArgb(28, 28, 28) : Color.FromArgb(220, 220, 220))
+                : (_isHovered ? (Theme.IsDarkMode ? Color.FromArgb(52, 52, 52) : Color.FromArgb(238, 238, 238)) : baseInputBg);
 
-            Color borderColor = _isHovered ? Theme.Gold : Color.FromArgb(70, 70, 70);
+            Color borderColor = _isHovered ? Theme.Gold : Theme.InputBorder;
 
             using (SolidBrush bgBrush = new SolidBrush(bg))
             {
