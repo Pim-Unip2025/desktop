@@ -8,7 +8,6 @@ namespace TronusDesktop.Views
 {
     public partial class UcLanding : UserControl
     {
-        private AccessibilityThemeButton btnTheme;
         private Label tagLabel;
         private PictureBox logoBox;
         private Label subtitleLabel;
@@ -27,7 +26,7 @@ namespace TronusDesktop.Views
             this.BackColor = Theme.Background;
 
             string heroPath = Path.Combine(Application.StartupPath, "img", "hero.png");
-            if (Theme.IsDarkMode && File.Exists(heroPath))
+            if (File.Exists(heroPath))
             {
                 this.BackgroundImage = Image.FromFile(heroPath);
                 this.BackgroundImageLayout = ImageLayout.Stretch;
@@ -35,9 +34,9 @@ namespace TronusDesktop.Views
 
             this.Paint += (s, e) =>
             {
+                int gradientWidth = Math.Min(this.Width, 620);
                 if (Theme.IsDarkMode)
                 {
-                    int gradientWidth = this.Width / 2 + 150;
                     using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
                         new Point(0, 0), new Point(gradientWidth, 0),
                         Color.FromArgb(240, 10, 10, 10), Color.Transparent))
@@ -45,17 +44,17 @@ namespace TronusDesktop.Views
                         e.Graphics.FillRectangle(brush, new Rectangle(0, 0, gradientWidth, this.Height));
                     }
                 }
+                else
+                {
+                    using (var brush = new System.Drawing.Drawing2D.LinearGradientBrush(
+                        new Point(0, 0), new Point(gradientWidth, 0),
+                        Color.FromArgb(225, 252, 250, 244), Color.FromArgb(25, 252, 250, 244)))
+                    {
+                        e.Graphics.FillRectangle(brush, new Rectangle(0, 0, gradientWidth, this.Height));
+                    }
+                }
             };
             this.Resize += (s, e) => this.Invalidate();
-
-            // Botão de acessibilidade contextual na tela inicial
-            btnTheme = new AccessibilityThemeButton
-            {
-                Size = new Size(130, 30),
-                Location = new Point(Math.Max(500, this.Width - 160), 25),
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-            this.Controls.Add(btnTheme);
 
             tagLabel = new Label
             {

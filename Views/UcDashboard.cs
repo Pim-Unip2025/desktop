@@ -17,7 +17,6 @@ namespace TronusDesktop.Views
         private Label lblTitulo;
         private Label lblSubtitulo;
         private TronusButton btnVoltar;
-        private AccessibilityThemeButton btnTheme;
 
         private Panel mainScrollContainer;
         private FlowLayoutPanel flowKpis;
@@ -150,23 +149,11 @@ namespace TronusDesktop.Views
             btnVoltar.Click += (s, e) => (this.FindForm() as MainForm)?.LoadControl(new UcReinos());
             topHudPanel.Controls.Add(btnVoltar);
 
-            // Botão de acessibilidade contextual no HUD do Dashboard
-            btnTheme = new AccessibilityThemeButton
-            {
-                Size = new Size(130, 30),
-                Location = new Point(675, 22)
-            };
-            topHudPanel.Controls.Add(btnTheme);
-
             void ReposDashboardButtons()
             {
                 if (btnVoltar != null && topHudPanel != null)
                 {
                     btnVoltar.Location = new Point(topHudPanel.Width - btnVoltar.Width - 25, 17);
-                    if (btnTheme != null)
-                    {
-                        btnTheme.Location = new Point(btnVoltar.Left - btnTheme.Width - 12, 22);
-                    }
                 }
             }
 

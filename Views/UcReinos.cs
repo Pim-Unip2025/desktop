@@ -25,7 +25,6 @@ namespace TronusDesktop.Views
         private TronusButton btnRanking;
         private TronusButton btnDashboard;
         private TronusButton btnLogout;
-        private AccessibilityThemeButton btnTheme;
 
         // Cabeçalho da página
         private TronusPanel headerCard;
@@ -211,14 +210,6 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
-            // Botão de acessibilidade contextual no HUD dos Reinos
-            btnTheme = new AccessibilityThemeButton
-            {
-                Size = new Size(130, 30),
-                Location = new Point(440, 22)
-            };
-            topHudPanel.Controls.Add(btnTheme);
-
             topHudPanel.Resize += (s, e) => RepositionHudButtons();
             RepositionHudButtons();
 
@@ -296,10 +287,6 @@ namespace TronusDesktop.Views
                 if (btnRanking != null)
                 {
                     btnRanking.Location = new Point(btnDashboard.Left - btnRanking.Width - 10, 18);
-                    if (btnTheme != null)
-                    {
-                        btnTheme.Location = new Point(btnRanking.Left - btnTheme.Width - 12, 22);
-                    }
                 }
             }
         }

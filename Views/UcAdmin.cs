@@ -16,7 +16,6 @@ namespace TronusDesktop.Views
         private Label lblTitulo;
         private Label lblSubtitulo;
         private TronusButton btnLogout;
-        private AccessibilityThemeButton btnTheme;
 
         private Panel mainScrollContainer;
         private FlowLayoutPanel flowKpis;
@@ -137,23 +136,11 @@ namespace TronusDesktop.Views
             };
             topHudPanel.Controls.Add(btnLogout);
 
-            // Botão de acessibilidade contextual no HUD do Administrador
-            btnTheme = new AccessibilityThemeButton
-            {
-                Size = new Size(130, 30),
-                Location = new Point(715, 22)
-            };
-            topHudPanel.Controls.Add(btnTheme);
-
             void ReposAdminButtons()
             {
                 if (btnLogout != null && topHudPanel != null)
                 {
                     btnLogout.Location = new Point(topHudPanel.Width - btnLogout.Width - 25, 18);
-                    if (btnTheme != null)
-                    {
-                        btnTheme.Location = new Point(btnLogout.Left - btnTheme.Width - 12, 22);
-                    }
                 }
             }
 

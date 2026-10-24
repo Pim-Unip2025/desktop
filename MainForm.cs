@@ -27,6 +27,7 @@ namespace TronusDesktop
 
         private Panel topBar;
         private Label titleLabel;
+        private Panel windowButtonsPanel;
         private AccessibilityThemeButton btnTheme;
         private Button btnMinimize;
         private Button btnMaximize;
@@ -80,8 +81,10 @@ namespace TronusDesktop
                 Text = "TRONUS — O Caminho do Herói Acadêmico",
                 ForeColor = Theme.Gold,
                 Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                AutoSize = true,
+                AutoSize = false,
+                AutoEllipsis = true,
                 Location = new Point(15, 9),
+                Size = new Size(500, 24),
                 BackColor = Color.Transparent
             };
             titleLabel.MouseDown += TopBar_MouseDown;
@@ -90,24 +93,20 @@ namespace TronusDesktop
             titleLabel.DoubleClick += (s, e) => ToggleMaximize();
             topBar.Controls.Add(titleLabel);
 
-            // Container para os botões da janela e acessibilidade
-            var windowButtonsPanel = new FlowLayoutPanel
+            // Container para os botões da janela e acessibilidade (painel com posições absolutas imutáveis)
+            windowButtonsPanel = new Panel
             {
                 Dock = DockStyle.Right,
-                Width = 285,
+                Width = 295,
                 Height = 40,
-                FlowDirection = FlowDirection.LeftToRight,
-                WrapContents = false,
-                BackColor = Color.Transparent,
-                Margin = new Padding(0),
-                Padding = new Padding(0)
+                BackColor = Theme.TopBarBackground
             };
 
             // Botão de Acessibilidade (Modo Claro / Modo Escuro)
             btnTheme = new AccessibilityThemeButton
             {
                 Size = new Size(130, 30),
-                Margin = new Padding(0, 5, 8, 5)
+                Location = new Point(10, 5)
             };
 
             // Botão Minimizar
@@ -117,9 +116,9 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
+                Location = new Point(150, 0),
                 Cursor = Cursors.Hand,
-                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
-                Margin = new Padding(0)
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
             btnMinimize.FlatAppearance.BorderSize = 0;
             btnMinimize.Click += (s, e) => this.WindowState = FormWindowState.Minimized;
@@ -133,9 +132,9 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
+                Location = new Point(195, 0),
                 Cursor = Cursors.Hand,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
-                Margin = new Padding(0)
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
             };
             btnMaximize.FlatAppearance.BorderSize = 0;
             btnMaximize.Click += (s, e) => ToggleMaximize();
@@ -149,9 +148,9 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
+                Location = new Point(240, 0),
                 Cursor = Cursors.Hand,
-                Font = new Font("Segoe UI", 11F, FontStyle.Bold),
-                Margin = new Padding(0)
+                Font = new Font("Segoe UI", 11F, FontStyle.Bold)
             };
             closeBtn.FlatAppearance.BorderSize = 0;
             closeBtn.Click += (s, e) => Application.Exit();
@@ -164,17 +163,23 @@ namespace TronusDesktop
             windowButtonsPanel.Controls.Add(closeBtn);
             topBar.Controls.Add(windowButtonsPanel);
 
+            topBar.Resize += (s, e) =>
+            {
+                int maxTitleWidth = Math.Max(100, topBar.Width - windowButtonsPanel.Width - 30);
+                titleLabel.Size = new Size(maxTitleWidth, 24);
+            };
+
             Theme.ThemeChanged += OnThemeChanged;
 
             // Painel central hospedeiro dos UserControls
             contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.Transparent
+                BackColor = Theme.Background
             };
-            this.Controls.Add(contentPanel);
             this.Controls.Add(topBar);
-            topBar.SendToBack();
+            this.Controls.Add(contentPanel);
+            contentPanel.BringToFront();
 
             LoadControl(new Views.UcLanding());
         }
@@ -265,13 +270,15 @@ namespace TronusDesktop
         {
             this.BackColor = Theme.Background;
             topBar.BackColor = Theme.TopBarBackground;
+            if (windowButtonsPanel != null) windowButtonsPanel.BackColor = Theme.TopBarBackground;
+            if (contentPanel != null) contentPanel.BackColor = Theme.Background;
             titleLabel.ForeColor = Theme.Gold;
             btnMinimize.ForeColor = Theme.Gold;
             btnMaximize.ForeColor = Theme.Gold;
             closeBtn.ForeColor = Theme.Gold;
             topBar.Invalidate();
 
-            if (contentPanel.Controls.Count > 0)
+            if (contentPanel != null && contentPanel.Controls.Count > 0)
             {
                 Theme.ApplyTheme(contentPanel.Controls[0]);
             }

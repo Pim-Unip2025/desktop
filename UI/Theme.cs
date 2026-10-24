@@ -115,33 +115,12 @@ namespace TronusDesktop.UI
         {
             if (root == null) return;
 
-            // Tratamento de UserControl e Form
+            // Tratamento de UserControl e Form:
+            // O plano de fundo (BackgroundImage/papel de parede) é estritamente PRESERVADO
+            // sem ser alterado, removido ou substituído ao alternar entre os modos claro e escuro.
             if (root is UserControl or Form)
             {
                 root.BackColor = Background;
-
-                string bgPath = (root.GetType().Name == "UcLanding")
-                    ? Path.Combine(Application.StartupPath, "img", "hero.png")
-                    : Path.Combine(Application.StartupPath, "img", "fundo_reinos.jpg");
-
-                if (IsDarkMode && File.Exists(bgPath))
-                {
-                    if (root.Tag?.ToString() != "no_bg")
-                    {
-                        try
-                        {
-                            root.BackgroundImage = Image.FromFile(bgPath);
-                            root.BackgroundImageLayout = ImageLayout.Stretch;
-                        }
-                        catch { }
-                    }
-                }
-                else if (!IsDarkMode)
-                {
-                    // No modo claro acessível, remove o papel de parede escuro para focar no conteúdo de alto contraste
-                    root.BackgroundImage = null;
-                }
-
                 root.Invalidate();
             }
 

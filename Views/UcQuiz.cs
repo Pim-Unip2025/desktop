@@ -29,7 +29,6 @@ namespace TronusDesktop.Views
         private TronusButton btnAnterior;
         private TronusButton btnProxima;
         private TronusButton btnSair;
-        private AccessibilityThemeButton btnTheme;
 
         // Painel de Resultados
         private TronusPanel resultCard;
@@ -94,15 +93,6 @@ namespace TronusDesktop.Views
                 }
             };
             this.Controls.Add(btnSair);
-
-            // Botão de acessibilidade contextual na tela de quiz
-            btnTheme = new AccessibilityThemeButton
-            {
-                Size = new Size(130, 30),
-                Location = new Point(680, 27),
-                Anchor = AnchorStyles.Top | AnchorStyles.Right
-            };
-            this.Controls.Add(btnTheme);
 
             // Card principal da questão
             questionCard = new TronusPanel
