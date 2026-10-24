@@ -92,7 +92,8 @@ TronusDesktop/
 ├── UI/                         # Componentes visuais personalizados
 │   ├── Theme.cs                # Paleta de cores, gradientes e constantes visuais
 │   ├── TronusButton.cs         # Botão customizado com cantos arredondados e hover
-│   └── TronusPanel.cs          # Card medieval translúcido com borda dourada
+│   ├── TronusPanel.cs          # Card medieval translúcido com borda dourada
+│   └── PasswordToggleButton.cs # Botão vetorial GDI+ para alternar visibilidade de senhas
 ├── Views/                      # Telas (UserControls) do sistema
 │   ├── UcLanding.cs            # Tela de boas-vindas / Hero
 │   ├── UcLogin.cs              # Autenticação de usuários com roteamento por papel

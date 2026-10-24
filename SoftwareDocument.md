@@ -29,6 +29,12 @@ Componente que herda de `Button`:
 Componente que herda de `Panel`:
 - **Modificação:** O método `OnPaint` recria o efeito dos cards estilizados translúcidos, possuindo fundo escuro semi-transparente, cantos arredondados e borda dourada fina de 1 pixel.
 
+### 1.4 `PasswordToggleButton.cs`
+Componente customizado para alternância e visualização de senhas (`PasswordChar`):
+- **Renderização Vetorial GDI+:** Desenha com antialiasing um ícone de olho amendoado estilizado e pupila iluminada. Quando a senha está oculta, renderiza o corte diagonal indicando máscara ativa; quando visível, ilumina a pupila em tom dourado com reflexo especular.
+- **Interatividade & Acessibilidade:** Suporte a hover com borda dourada, tooltip nativo contextual (*"Ver senha"* / *"Ocultar senha"*), preservação contínua do foco e cursor de edição no `TextBox` associado, e `TabStop = false` para não interromper a navegação por teclado.
+- **Presença em Telas:** Integrado aos campos de senha de `UcLogin` (1 campo), `UcRegister` (2 campos: senha e confirmação) e `UcForgotPassword` (2 campos: nova senha e confirmação).
+
 ---
 
 ## 2. Janela Base (A Casca)
@@ -288,7 +294,8 @@ A dinâmica temporal de troca de mensagens entre telas, serviços e persistênci
 ## 8. Status do Roadmap de Desenvolvimento
 
 - [x] Arquitetura base SPA com `MainForm` e `LoadControl`.
-- [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`).
+- [x] Framework visual customizado (`Theme`, `TronusButton`, `TronusPanel`, `PasswordToggleButton`).
+- [x] Alternância e visualização de senha com feedback visual vetorial (`PasswordToggleButton`) em Login, Registro e Troca de Senha.
 - [x] Auto-ajuste de janela inteligente por resolução (`AutoAjustarAoIniciar`), tela cheia sem cobrir a barra de tarefas (`WM_GETMINMAXINFO`) e controles de janela na barra de título (Minimizar, Maximizar/Restaurar, Fechar).
 - [x] Redimensionamento fluido por arrasto de bordas (`WM_NCHITTEST`) e controles responsivos (`CenterCard` e `AdjustLayout`).
 - [x] `UcLanding.cs` com arte medieval e redirecionamento.

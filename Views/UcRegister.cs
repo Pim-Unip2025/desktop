@@ -22,9 +22,11 @@ namespace TronusDesktop.Views
         
         private Label passLabel;
         private TextBox passBox;
+        private PasswordToggleButton btnTogglePass;
         
         private Label confirmPassLabel;
         private TextBox confirmPassBox;
+        private PasswordToggleButton btnToggleConfirmPass;
         
         private TronusButton btnSubmit;
         private Label backLabel;
@@ -148,7 +150,7 @@ namespace TronusDesktop.Views
 
             passBox = new TextBox
             {
-                Size = new Size(340, 30),
+                Size = new Size(300, 30),
                 Location = new Point(40, 350),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
@@ -157,6 +159,13 @@ namespace TronusDesktop.Views
                 BorderStyle = BorderStyle.FixedSingle
             };
             registerCard.Controls.Add(passBox);
+
+            btnTogglePass = new PasswordToggleButton(passBox)
+            {
+                Size = new Size(36, 29),
+                Location = new Point(344, 350)
+            };
+            registerCard.Controls.Add(btnTogglePass);
 
             confirmPassLabel = new Label
             {
@@ -171,7 +180,7 @@ namespace TronusDesktop.Views
 
             confirmPassBox = new TextBox
             {
-                Size = new Size(340, 30),
+                Size = new Size(300, 30),
                 Location = new Point(40, 430),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
@@ -180,6 +189,13 @@ namespace TronusDesktop.Views
                 BorderStyle = BorderStyle.FixedSingle
             };
             registerCard.Controls.Add(confirmPassBox);
+
+            btnToggleConfirmPass = new PasswordToggleButton(confirmPassBox)
+            {
+                Size = new Size(36, 29),
+                Location = new Point(344, 430)
+            };
+            registerCard.Controls.Add(btnToggleConfirmPass);
 
             btnSubmit = new TronusButton
             {

@@ -14,6 +14,7 @@ namespace TronusDesktop.Views
         private TextBox emailBox;
         private Label passLabel;
         private TextBox passBox;
+        private PasswordToggleButton btnTogglePass;
         private TronusButton btnSubmit;
         private Label backLabel;
 
@@ -93,7 +94,7 @@ namespace TronusDesktop.Views
 
             passBox = new TextBox
             {
-                Size = new Size(320, 30),
+                Size = new Size(280, 30),
                 Location = new Point(40, 230),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
@@ -103,6 +104,13 @@ namespace TronusDesktop.Views
             };
             passBox.KeyDown += TextBox_KeyDown;
             loginCard.Controls.Add(passBox);
+
+            btnTogglePass = new PasswordToggleButton(passBox)
+            {
+                Size = new Size(36, 29),
+                Location = new Point(324, 230)
+            };
+            loginCard.Controls.Add(btnTogglePass);
 
             btnSubmit = new TronusButton
             {

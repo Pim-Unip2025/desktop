@@ -32,8 +32,10 @@ namespace TronusDesktop.Views
         private Panel step3Panel;
         private Label lblNovaSenha;
         private TextBox txtNovaSenha;
+        private PasswordToggleButton btnToggleNovaSenha;
         private Label lblConfirmaSenha;
         private TextBox txtConfirmaSenha;
+        private PasswordToggleButton btnToggleConfirmaSenha;
         private TronusButton btnSalvarSenha;
         private Label lblVoltarLogin3;
 
@@ -313,7 +315,7 @@ namespace TronusDesktop.Views
 
             txtNovaSenha = new TextBox
             {
-                Size = new Size(380, 30),
+                Size = new Size(340, 30),
                 Location = new Point(0, 35),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
@@ -322,6 +324,13 @@ namespace TronusDesktop.Views
                 BorderStyle = BorderStyle.FixedSingle
             };
             step3Panel.Controls.Add(txtNovaSenha);
+
+            btnToggleNovaSenha = new PasswordToggleButton(txtNovaSenha)
+            {
+                Size = new Size(36, 29),
+                Location = new Point(344, 35)
+            };
+            step3Panel.Controls.Add(btnToggleNovaSenha);
 
             lblConfirmaSenha = new Label
             {
@@ -336,7 +345,7 @@ namespace TronusDesktop.Views
 
             txtConfirmaSenha = new TextBox
             {
-                Size = new Size(380, 30),
+                Size = new Size(340, 30),
                 Location = new Point(0, 110),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
@@ -353,6 +362,13 @@ namespace TronusDesktop.Views
                 }
             };
             step3Panel.Controls.Add(txtConfirmaSenha);
+
+            btnToggleConfirmaSenha = new PasswordToggleButton(txtConfirmaSenha)
+            {
+                Size = new Size(36, 29),
+                Location = new Point(344, 110)
+            };
+            step3Panel.Controls.Add(btnToggleConfirmaSenha);
 
             btnSalvarSenha = new TronusButton
             {
@@ -455,6 +471,8 @@ namespace TronusDesktop.Views
 
             txtNovaSenha.Clear();
             txtConfirmaSenha.Clear();
+            btnToggleNovaSenha?.Reset();
+            btnToggleConfirmaSenha?.Reset();
             MostrarPasso(3);
         }
 
