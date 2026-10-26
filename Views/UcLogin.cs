@@ -16,6 +16,7 @@ namespace TronusDesktop.Views
         private TextBox passBox;
         private PasswordToggleButton btnTogglePass;
         private TronusButton btnSubmit;
+        private Button btnOffline;
         private Label backLabel;
 
         public UcLogin()
@@ -40,8 +41,8 @@ namespace TronusDesktop.Views
 
             loginCard = new TronusPanel
             {
-                Size = new Size(400, 500),
-                Location = new Point((1024 - 400) / 2, (728 - 500) / 2) // Center in 1024x728
+                Size = new Size(400, 510),
+                Location = new Point((1024 - 400) / 2, (728 - 510) / 2) // Center in 1024x728
             };
             this.Controls.Add(loginCard);
 
@@ -64,7 +65,7 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.PrimaryText,
                 Font = new Font("Segoe UI", 10F),
                 AutoSize = true,
-                Location = new Point(40, 120),
+                Location = new Point(40, 110),
                 BackColor = Color.Transparent
             };
             loginCard.Controls.Add(emailLabel);
@@ -72,7 +73,7 @@ namespace TronusDesktop.Views
             emailBox = new TextBox
             {
                 Size = new Size(320, 30),
-                Location = new Point(40, 150),
+                Location = new Point(40, 140),
                 Font = new Font("Segoe UI", 12F),
                 BackColor = Color.FromArgb(40, 40, 40),
                 ForeColor = Color.White,
@@ -87,7 +88,7 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.PrimaryText,
                 Font = new Font("Segoe UI", 10F),
                 AutoSize = true,
-                Location = new Point(40, 200),
+                Location = new Point(40, 190),
                 BackColor = Color.Transparent
             };
             loginCard.Controls.Add(passLabel);
@@ -95,7 +96,7 @@ namespace TronusDesktop.Views
             passBox = new TextBox
             {
                 Size = new Size(280, 30),
-                Location = new Point(40, 230),
+                Location = new Point(40, 220),
                 Font = new Font("Segoe UI", 12F),
                 PasswordChar = '•',
                 BackColor = Color.FromArgb(40, 40, 40),
@@ -108,18 +109,36 @@ namespace TronusDesktop.Views
             btnTogglePass = new PasswordToggleButton(passBox)
             {
                 Size = new Size(36, 29),
-                Location = new Point(324, 230)
+                Location = new Point(324, 220)
             };
             loginCard.Controls.Add(btnTogglePass);
 
             btnSubmit = new TronusButton
             {
                 Text = "ENTRAR",
-                Size = new Size(320, 45),
-                Location = new Point(40, 300)
+                Size = new Size(320, 42),
+                Location = new Point(40, 280)
             };
             btnSubmit.Click += BtnSubmit_Click;
             loginCard.Controls.Add(btnSubmit);
+
+            btnOffline = new Button
+            {
+                Text = "⚡ ENTRAR EM MODO OFFLINE (DEMO)",
+                Size = new Size(320, 38),
+                Location = new Point(40, 335),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(35, 212, 175, 55),
+                ForeColor = Theme.Gold,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            btnOffline.FlatAppearance.BorderColor = Color.FromArgb(160, 212, 175, 55);
+            btnOffline.FlatAppearance.BorderSize = 1;
+            btnOffline.Click += BtnOffline_Click;
+            btnOffline.MouseEnter += (s, e) => btnOffline.BackColor = Color.FromArgb(70, 212, 175, 55);
+            btnOffline.MouseLeave += (s, e) => btnOffline.BackColor = Color.FromArgb(35, 212, 175, 55);
+            loginCard.Controls.Add(btnOffline);
 
             backLabel = new Label
             {
@@ -127,7 +146,7 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.DimText,
                 Font = new Font("Segoe UI", 10F),
                 AutoSize = true,
-                Location = new Point(40, 380),
+                Location = new Point(40, 400),
                 BackColor = Color.Transparent,
                 Cursor = Cursors.Hand
             };
@@ -144,7 +163,7 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.DimText,
                 Font = new Font("Segoe UI", 9.5F),
                 AutoSize = true,
-                Location = new Point(230, 380),
+                Location = new Point(230, 400),
                 BackColor = Color.Transparent,
                 Cursor = Cursors.Hand
             };
@@ -252,12 +271,100 @@ namespace TronusDesktop.Views
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Erro de conexão: " + ex.Message, "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                var resposta = MessageBox.Show(
+                    $"Não foi possível conectar aos servidores de nuvem:\n{ex.Message}\n\n" +
+                    "Deseja alternar para o MODO OFFLINE (Demonstração Local Resiliente) agora?",
+                    "Conexão Indisponível — Tronus Desktop",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (resposta == DialogResult.Yes)
+                {
+                    BtnOffline_Click(sender, e);
+                }
             }
             finally
             {
                 btnSubmit.Enabled = true;
                 btnSubmit.Text = "ENTRAR";
+            }
+        }
+
+        /// <summary>
+        /// Realiza o login direto no Modo Offline / Demonstração Resiliente.
+        /// Carrega o Herói padrão Sir Arthur (Duque, 38 estrelas, 5 reinos)
+        /// ou cria um novo se especificado um identificador inexistente.
+        /// </summary>
+        private async void BtnOffline_Click(object sender, EventArgs e)
+        {
+            btnSubmit.Enabled = false;
+            if (btnOffline != null)
+            {
+                btnOffline.Enabled = false;
+                btnOffline.Text = "INICIANDO OFFLINE...";
+            }
+
+            try
+            {
+                TronusDesktop.Services.ApiService.IsOfflineMode = true;
+
+                // Se o usuário digitou algum nome ou email no campo, usa; senão usa o padrão "Arthur Pendragon"
+                string id = string.IsNullOrWhiteSpace(emailBox.Text) ? "Arthur Pendragon" : emailBox.Text.Trim();
+                var req = new TronusDesktop.Models.LoginRequest
+                {
+                    Identificador = id,
+                    Senha = string.IsNullOrWhiteSpace(passBox.Text) ? "offline" : passBox.Text
+                };
+
+                var res = await TronusDesktop.Services.ApiService.Instance.PostAsync<TronusDesktop.Models.LoginRequest, TronusDesktop.Models.AuthResponse>("/auth/login", req);
+                TronusDesktop.Services.SessionManager.Login(res);
+
+                if (res.Usuario.Papel == "aluno")
+                {
+                    try
+                    {
+                        var heroi = await TronusDesktop.Services.ApiService.Instance.GetAsync<TronusDesktop.Models.PersonagemDto>("/personagens/me");
+                        MessageBox.Show(
+                            $"⚡ MODO OFFLINE ATIVADO COM SUCESSO!\n\n" +
+                            $"Bem-vindo ao Tronus, Herói {heroi.Nome}!\n" +
+                            $"Título: {heroi.TituloAtual} · {heroi.TotalEstrelas} Estrelas acumuladas\n\n" +
+                            $"• Simulação autônoma ativa em memória local.\n" +
+                            $"• Reinos, desafios de combate e ranking disponíveis sem internet.",
+                            "Tronus Desktop — Modo Offline",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
+                        (this.FindForm() as MainForm)?.LoadControl(new UcReinos());
+                    }
+                    catch (TronusDesktop.Services.ApiException ex) when (ex.StatusCode == 404)
+                    {
+                        MessageBox.Show("Modo Offline ativado! Vamos criar o seu herói local.", "Novo Jogador Offline", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        (this.FindForm() as MainForm)?.LoadControl(new UcCharacter());
+                    }
+                }
+                else if (res.Usuario.Papel == "professor")
+                {
+                    MessageBox.Show($"Bem-vindo(a), Professor(a) {res.Usuario.Nome}!\n[MODO OFFLINE ATIVO]", "Portal Pedagógico", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    (this.FindForm() as MainForm)?.LoadControl(new UcProfessor());
+                }
+                else if (res.Usuario.Papel == "admin")
+                {
+                    MessageBox.Show($"Bem-vindo(a), Administrador(a) {res.Usuario.Nome}!\n[MODO OFFLINE ATIVO]", "Painel Administrativo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    (this.FindForm() as MainForm)?.LoadControl(new UcAdmin());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Falha ao inicializar o Modo Offline: " + ex.Message, "Erro Modo Offline", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                btnSubmit.Enabled = true;
+                if (btnOffline != null)
+                {
+                    btnOffline.Enabled = true;
+                    btnOffline.Text = "⚡ ENTRAR EM MODO OFFLINE (DEMO)";
+                }
             }
         }
         #endregion

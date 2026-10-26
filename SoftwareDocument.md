@@ -241,6 +241,18 @@ A aplicação Desktop atua como cliente HTTP e conecta-se à infraestrutura de s
 - **Tráfego de Saída (Outbound):** O computador do usuário precisa permitir conexões de saída TCP na **porta 443** direcionadas ao domínio `https://king-blue-nine.vercel.app`.
 - **Compatibilidade com Redes Acadêmicas (UNIP):** Por utilizar estritamente a porta padrão de navegação segura (443), o Tronus Desktop opera transparentemente através de proxies institucionais, firewalls estritos de laboratórios universitários e redes corporativas sem exigir abertura de portas arbitrárias ou privilégios de administrador de rede.
 
+### 4.5 Modo Offline e Resiliência Operacional (`OfflineDataService.cs`)
+Para assegurar a continuidade da apresentação acadêmica do projeto perante a banca examinadora da UNIP — mesmo em cenários de oscilação, queda de sinal Wi-Fi, bloqueio de portas por firewall do campus ou indisponibilidade temporária de nuvem —, o Tronus Desktop foi equipado com um **Modo Offline Autônomo e Resiliente**:
+
+- **Arquitetura Desacoplada e Transparente:** Todas as chamadas de dados passam pelo singleton `ApiService.Instance`. Quando o modo offline é acionado, as requisições (`GetAsync`, `PostAsync`, `DeleteAsync`) são automaticamente redirecionadas para o `OfflineDataService.cs` em memória, dispensando qualquer alteração nas camadas visuais (`Views`).
+- **Seed Completo de Dados Acadêmicos:**
+  - **Autenticação Demo:** Carregamento automático do herói veterano `Sir Arthur` (Duque, 38 estrelas acumuladas, avatar `masc1`). Suporta também login com perfis de Professor (`Prof. Albus`) e Administrador (`Admin Morgana`).
+  - **5 Reinos & 15 Fases Modeladas:** Mapa com os reinos de *Python*, *C++*, *Banco de Dados*, *Redes* e *Engenharia de Software*, com progressão real de estrelas e desbloqueio condicional de fases.
+  - **Engine de Desafios & Quizzes Pedagógicos:** Banco com dezenas de questões reais de ciência da computação (lógica, algoritmos, SQL, modelo OSI, engenharia de software), com motor local de correção de alternativas, cálculo de estrelas (1 a 3), evolução de patentes e métricas no painel analítico.
+- **Badge de Status Interativo na TopBar:** O `MainForm` exibe um indicador interativo em tempo real: `🟢 Online` (verde) quando conectado à API em nuvem e `⚡ Offline (Demo)` (dourado/âmbar) quando em execução local. Clicar no badge permite alternar a conectividade em tempo de execução.
+- **Botão Direto na Tela de Login:** A tela de login (`UcLogin.cs`) disponibiliza o botão destacado `"⚡ ENTRAR EM MODO OFFLINE (DEMO)"`, permitindo acesso instantâneo sem necessidade de preencher credenciais.
+- **Fallback Automático de Conexão:** Caso o usuário tente efetuar login online e ocorra timeout ou falha de rede, o sistema exibe diálogo interativo oferecendo alternância imediata para o Modo Offline sem travar o aplicativo.
+
 ---
 
 ## 5. Banco de Dados e Backend (PostgreSQL no Supabase)

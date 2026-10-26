@@ -12,14 +12,30 @@ namespace TronusDesktop.Services
     {
         private readonly HttpClient _httpClient;
 
-        // Make it a singleton or instantiate once in Program.cs. For simplicity, we use a single instance.
         public static ApiService Instance { get; } = new ApiService();
+
+        private static bool _isOfflineMode = false;
+        public static bool IsOfflineMode
+        {
+            get => _isOfflineMode;
+            set
+            {
+                if (_isOfflineMode != value)
+                {
+                    _isOfflineMode = value;
+                    OfflineModeChanged?.Invoke(_isOfflineMode);
+                }
+            }
+        }
+
+        public static event Action<bool> OfflineModeChanged;
 
         private ApiService()
         {
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("https://king-blue-nine.vercel.app");
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpClient.Timeout = TimeSpan.FromSeconds(8); // Timeout rápido para evitar travamento se a rede estiver instável
         }
 
         private void ConfigurarAutorizacao()
@@ -48,11 +64,9 @@ namespace TronusDesktop.Services
                     // If we can't parse the error, just throw with the status code
                 }
                 
-                // If 401 Unauthorized, we might want to trigger a global event to logout
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     SessionManager.Logout();
-                    // We can handle the redirect to login screen in the UI layer catching this exception
                 }
 
                 throw new ApiException((int)response.StatusCode, errorResponse);
@@ -61,6 +75,11 @@ namespace TronusDesktop.Services
 
         public async Task<T> GetAsync<T>(string endpoint)
         {
+            if (IsOfflineMode)
+            {
+                return await OfflineDataService.HandleGetAsync<T>(endpoint);
+            }
+
             ConfigurarAutorizacao();
             var response = await _httpClient.GetAsync(endpoint);
             await TratarErroAsync(response);
@@ -69,6 +88,11 @@ namespace TronusDesktop.Services
 
         public async Task<TResponse> PostAsync<TRequest, TResponse>(string endpoint, TRequest data)
         {
+            if (IsOfflineMode)
+            {
+                return await OfflineDataService.HandlePostAsync<TRequest, TResponse>(endpoint, data);
+            }
+
             ConfigurarAutorizacao();
             var response = await _httpClient.PostAsJsonAsync(endpoint, data);
             await TratarErroAsync(response);
@@ -77,6 +101,12 @@ namespace TronusDesktop.Services
 
         public async Task PostAsync<TRequest>(string endpoint, TRequest data)
         {
+            if (IsOfflineMode)
+            {
+                await OfflineDataService.HandlePostAsync(endpoint, data);
+                return;
+            }
+
             ConfigurarAutorizacao();
             var response = await _httpClient.PostAsJsonAsync(endpoint, data);
             await TratarErroAsync(response);
@@ -84,6 +114,12 @@ namespace TronusDesktop.Services
 
         public async Task DeleteAsync(string endpoint)
         {
+            if (IsOfflineMode)
+            {
+                await OfflineDataService.HandleDeleteAsync(endpoint);
+                return;
+            }
+
             ConfigurarAutorizacao();
             var response = await _httpClient.DeleteAsync(endpoint);
             await TratarErroAsync(response);

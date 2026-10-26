@@ -420,8 +420,8 @@ namespace TronusDesktop.Views
                 };
                 card.Controls.Add(lblNome);
 
-                // Badge "EM BREVE" para reinos sem questões (apenas Python tem questões prontas na carga inicial)
-                bool isReinoAtivo = reino.Nome.Equals("Python", StringComparison.OrdinalIgnoreCase);
+                // Badge "EM BREVE" para reinos sem questões (no modo offline todos os 5 reinos possuem questões simuladas)
+                bool isReinoAtivo = reino.Nome.Equals("Python", StringComparison.OrdinalIgnoreCase) || ApiService.IsOfflineMode;
                 if (!isReinoAtivo)
                 {
                     var lblEmBreve = new Label

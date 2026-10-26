@@ -28,6 +28,7 @@ namespace TronusDesktop
         private Panel topBar;
         private Label titleLabel;
         private Panel windowButtonsPanel;
+        private Button btnOfflineStatus;
         private AccessibilityThemeButton btnTheme;
         private Button btnMinimize;
         private Button btnMaximize;
@@ -93,20 +94,43 @@ namespace TronusDesktop
             titleLabel.DoubleClick += (s, e) => ToggleMaximize();
             topBar.Controls.Add(titleLabel);
 
-            // Container para os botões da janela e acessibilidade (painel com posições absolutas imutáveis)
+            // Container para os botões da janela, acessibilidade e conectividade (painel com posições absolutas)
             windowButtonsPanel = new Panel
             {
                 Dock = DockStyle.Right,
-                Width = 295,
+                Width = 415,
                 Height = 40,
                 BackColor = Theme.TopBarBackground
             };
+
+            // Botão/Indicador de Conectividade (Modo Online / Modo Offline Demo)
+            btnOfflineStatus = new Button
+            {
+                Size = new Size(115, 30),
+                Location = new Point(10, 5),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+            btnOfflineStatus.FlatAppearance.BorderSize = 1;
+            AtualizarVisualModoOffline();
+            btnOfflineStatus.Click += (s, e) =>
+            {
+                Services.ApiService.IsOfflineMode = !Services.ApiService.IsOfflineMode;
+                AtualizarVisualModoOffline();
+                string statusTxt = Services.ApiService.IsOfflineMode
+                    ? "⚡ MODO OFFLINE ATIVADO!\n\nA aplicação agora utiliza dados locais simulados de alta fidelidade para apresentações sem dependência de internet."
+                    : "🌐 MODO ONLINE ATIVADO!\n\nA aplicação agora realiza requisições diretamente para a API na nuvem.";
+                MessageBox.Show(statusTxt, "Conectividade", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            Services.ApiService.OfflineModeChanged += (isOffline) => AtualizarVisualModoOffline();
 
             // Botão de Acessibilidade (Modo Claro / Modo Escuro)
             btnTheme = new AccessibilityThemeButton
             {
                 Size = new Size(130, 30),
-                Location = new Point(10, 5)
+                Location = new Point(135, 5)
             };
 
             // Botão Minimizar
@@ -116,7 +140,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(150, 0),
+                Location = new Point(275, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
@@ -132,7 +156,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(195, 0),
+                Location = new Point(320, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold)
             };
@@ -148,7 +172,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(240, 0),
+                Location = new Point(365, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 11F, FontStyle.Bold)
             };
@@ -157,6 +181,7 @@ namespace TronusDesktop
             closeBtn.MouseEnter += (s, e) => closeBtn.BackColor = Color.FromArgb(60, 255, 50, 50);
             closeBtn.MouseLeave += (s, e) => closeBtn.BackColor = Color.Transparent;
 
+            windowButtonsPanel.Controls.Add(btnOfflineStatus);
             windowButtonsPanel.Controls.Add(btnTheme);
             windowButtonsPanel.Controls.Add(btnMinimize);
             windowButtonsPanel.Controls.Add(btnMaximize);
@@ -281,6 +306,28 @@ namespace TronusDesktop
             if (contentPanel != null && contentPanel.Controls.Count > 0)
             {
                 Theme.ApplyTheme(contentPanel.Controls[0]);
+            }
+
+            AtualizarVisualModoOffline();
+        }
+
+        private void AtualizarVisualModoOffline()
+        {
+            if (btnOfflineStatus == null) return;
+
+            if (Services.ApiService.IsOfflineMode)
+            {
+                btnOfflineStatus.Text = "⚡ Offline (Demo)";
+                btnOfflineStatus.ForeColor = Theme.IsDarkMode ? Color.FromArgb(255, 215, 0) : Color.FromArgb(170, 120, 15);
+                btnOfflineStatus.BackColor = Theme.IsDarkMode ? Color.FromArgb(50, 42, 20) : Color.FromArgb(245, 235, 205);
+                btnOfflineStatus.FlatAppearance.BorderColor = Theme.Gold;
+            }
+            else
+            {
+                btnOfflineStatus.Text = "🌐 Online";
+                btnOfflineStatus.ForeColor = Theme.IsDarkMode ? Color.FromArgb(80, 220, 120) : Color.FromArgb(20, 140, 60);
+                btnOfflineStatus.BackColor = Theme.IsDarkMode ? Color.FromArgb(20, 45, 30) : Color.FromArgb(220, 245, 225);
+                btnOfflineStatus.FlatAppearance.BorderColor = Theme.IsDarkMode ? Color.FromArgb(60, 180, 100) : Color.FromArgb(40, 160, 70);
             }
         }
 

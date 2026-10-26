@@ -16,6 +16,7 @@ Aplicação desktop oficial da plataforma gamificada **Tronus**, desenvolvida em
 8. [Pré-requisitos & Como Executar](#-pré-requisitos--como-executar)
 9. [Roteiro de Testes e Validação](#-roteiro-de-testes-e-validação)
 10. [Credenciais de Homologação](#-credenciais-de-homologação)
+11. [Modo Offline (Demonstração Resiliente para Banca)](#-modo-offline-demonstração-resiliente-para-banca)
 
 ---
 
@@ -45,6 +46,7 @@ graph TD
         UI[Design System - Theme / TronusButton / TronusPanel]
         Session[SessionManager - Estado & JWT]
         Api[ApiService - Singleton HttpClient]
+        Offline[OfflineDataService - Simulação em Memória]
     end
 
     subgraph Nuvem [Infraestrutura Cloud]
@@ -56,7 +58,8 @@ graph TD
     Views --> MainForm
     Views --> Api
     Api --> Session
-    Api -->|HTTPS JSON + Bearer JWT| Endpoint
+    Api -->|IsOfflineMode == false| Endpoint
+    Api -->|IsOfflineMode == true| Offline
     Endpoint -->|Transaction Pooler / Prisma| DB
 ```
 
@@ -98,7 +101,8 @@ TronusDesktop/
 │   └── ReinoModels.cs          # Matérias/Reinos e progresso por fases
 ├── Services/                   # Comunicação e infraestrutura
 │   ├── ApiException.cs         # Exceção customizada com códigos e mensagens da API
-│   ├── ApiService.cs           # Singleton HTTP com injeção de JWT e tratamento de erros
+│   ├── ApiService.cs           # Singleton HTTP com injeção de JWT e roteamento offline
+│   ├── OfflineDataService.cs   # Motor autônomo em memória para o Modo Offline / Demonstração
 │   └── SessionManager.cs       # Armazenamento em memória da sessão e usuário logado
 ├── UI/                         # Componentes visuais personalizados
 │   ├── Theme.cs                # Paleta dinâmica de cores, gradientes e gerenciador de acessibilidade
@@ -247,6 +251,24 @@ Para testes da equipe e avaliação de bancas acadêmicas:
 | **Administrador** | `admin` | `Tronus@adm1` | Painel Administrativo / API |
 | **Professor (Python)** | `prof_python` | `Python@prof1` | Painel do Professor / API |
 | **Aluno Homologação** | *(Criar via `UcRegister`)* | `Teste@123` | Criação de Herói → Reinos |
+
+---
+
+## ⚡ Modo Offline (Demonstração Resiliente para Banca)
+
+Pensado estrategicamente para a defesa acadêmica perante a banca examinadora da UNIP, o Tronus Desktop dispõe de uma infraestrutura de **alta disponibilidade e tolerância a falhas locais**:
+
+### 🎯 Como Acionar:
+1. **Botão Dedicado no Login:** Na tela `UcLogin`, clique diretamente no botão dourado **`⚡ ENTRAR EM MODO OFFLINE (DEMO)`**. O sistema inicializará instantaneamente o perfil veterano de `Sir Arthur` com dados pré-carregados.
+2. **Badge Interativo na TopBar:** A qualquer momento, clique no botão de status de rede no canto superior direito (`🟢 Online` ⇋ `⚡ Offline (Demo)`). A aplicação chaveará a fonte de dados em tempo de execução sem reiniciar o formulário.
+3. **Fallback Automático de Queda de Rede:** Se a internet oscilar ou cair durante a tentativa de login online, um diálogo oferecerá alternância imediata para o Modo Offline local.
+
+### 🛡️ O que está disponível no Modo Offline:
+* **Autenticação Simulada:** Aluno (`Arthur Pendragon`), Professor (`Prof. Albus`) e Administrador (`Admin Morgana`).
+* **Perfil do Herói:** `Sir Arthur`, Patente `Duque`, 38 estrelas acumuladas e avatar medieval `masc1`.
+* **5 Reinos & 15 Fases Ativas:** *Python*, *C++*, *Banco de Dados*, *Redes* e *Engenharia de Software*.
+* **Banco de Desafios Completo:** Quizzes pedagógicos com enunciados reais de Ciência da Computação, validação de gabarito e cálculo dinâmico de estrelas.
+* **Dashboard Analítico:** KPIs de aproveitamento geral, histórico de acertos e gráficos por matéria.
 
 ---
 
