@@ -32,6 +32,7 @@ Abaixo estão os links de acesso direto aos artefatos de modelagem, arquitetura 
 | 🔄 **Diagramas de Sequência (UML)** | [**`DiagramaDeSequencia.md`**](DiagramaDeSequencia.md) | Modelagem comportamental e dinâmica com 11 diagramas de sequência cobrindo todas as telas, lifelines, tabelas de mensagens, regras de negócio e arquivos **Astah UML (`.asta` e `.astah`)**. |
 | 🔀 **Diagrama de Atividades (UML)** | [**`DiagramaDeAtividades.md`**](DiagramaDeAtividades.md) | Modelagem procedural dos fluxos de trabalho (DA01 a DA06), raias operacionais e arquivos **Astah UML (`DiagramasDeAtividade.asta` e `.astah`)**. |
 | 📘 **Manual do Usuário** | [**`ManualDoUsuario.md`**](ManualDoUsuario.md) | Guia ilustrado passo a passo para o usuário final em 12 capítulos, cobrindo instalação, atalhos, navegação por todas as telas e solução de dúvidas frequentes. |
+| 📊 **Apresentação Executiva (PPTX)** | [**`Apresentacao_Tronus_UML.pptx`**](Apresentacao_Tronus_UML.pptx) | Slides 16:9 widescreen para defesa acadêmica na UNIP com todos os diagramas de Casos de Uso, Atividades (DA01 a DA06) e Sequência (DS01 a DS11). |
 
 ---
 
@@ -86,6 +87,7 @@ A aplicação desktop consome os serviços da API REST na nuvem através das seg
 
 ```
 TronusDesktop/
+├── Apresentacao_Tronus_UML.pptx # Apresentação em slides 16:9 para a Banca Examinadora
 ├── DiagramaDeCasosDeUso.md     # Modelagem de Casos de Uso e Matriz RF01-RF15
 ├── DiagramaDeClasses.md        # Modelagem de Classes e Guia Astah UML
 ├── DiagramaDeSequencia.md      # Modelagem Dinâmica dos 11 Diagramas de Sequência
