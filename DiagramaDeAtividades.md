@@ -455,9 +455,16 @@ A matriz abaixo estabelece a correlação bidirecional entre os Casos de Uso fun
 
 Para os avaliadores acadêmicos e membros do grupo que desejarem inspecionar ou reproduzir os Diagramas de Atividade no software oficial **Astah UML**, segue o roteiro prático passo a passo:
 
-### 10.1 Criação do Diagrama no Astah
-1. Abra o arquivo de projeto do PIM no Astah (`docs/Engenharia de software ágil aplicada.asta`).
-2. Na árvore de estrutura (*Structure Tree*) à esquerda, clique com o botão direito no pacote **Tronus Desktop**.
+### 10.1 Arquivos Oficiais do Projeto Astah Gerados
+O projeto Astah completo contendo os 6 Diagramas de Atividades modelados (`DA01` a `DA06`), com suas raias de responsabilidade, nós de ação, decisões e fluxos operacionais, já foi gerado e disponibilizado oficialmente no repositório:
+- **`DiagramasDeAtividade.asta`** (Formato padrão nativo do Astah UML)
+- **`DiagramasDeAtividade.astah`** (Cópia no formato `.astah` para submissão acadêmica na UNIP)
+
+Ao abrir o arquivo no Astah UML, os 6 diagramas estarão listados diretamente na árvore do projeto (*Structure Tree*), prontos para visualização, refinamento ou exportação em alta resolução.
+
+### 10.2 Criação e Edição Manual de Novos Diagramas no Astah
+1. Abra o arquivo de projeto no Astah (`DiagramasDeAtividade.asta`).
+2. Na árvore de estrutura (*Structure Tree*) à esquerda, clique com o botão direito no pacote **Tronus Desktop** (ou na raiz do projeto).
 3. Selecione a opção **`Create Diagram`** ➔ **`Activity Diagram`**.
 4. Nomeie o diagrama (ex: `DA01 - Jornada Gamificada do Aluno`).
 
