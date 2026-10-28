@@ -70,8 +70,8 @@ graph LR
     end
 
     subgraph Persistencia [Camada de Dados]
-        MySQL[(Banco de Dados Relacional<br/>MySQL / MariaDB)]
-        Triggers[Triggers & Procedures<br/>trg_calcular_estrelas]
+        PostgreSQL[(Banco de Dados Relacional<br/>PostgreSQL / Supabase)]
+        Triggers[Triggers & Procedures<br/>trg_progresso_atualiza_personagem]
     end
 
     Desk --> API
@@ -80,10 +80,10 @@ graph LR
     API --> AuthAPI
     API --> GameAPI
     API --> AdminAPI
-    AuthAPI --> MySQL
-    GameAPI --> MySQL
+    AuthAPI --> PostgreSQL
+    GameAPI --> PostgreSQL
     GameAPI --> Triggers
-    AdminAPI --> MySQL
+    AdminAPI --> PostgreSQL
 ```
 
 > 🌐 **Protocolos de Transporte e Portas de Rede nos Diagramas de Sequência:**
@@ -105,8 +105,8 @@ Em cada diagrama de sequência, os seguintes elementos exercem papéis específi
 | **`API: ApiService`** | Client Service | Singleton HTTP que serializa DTOs em JSON, anexa cabeçalho `Authorization: Bearer <token>` e gerencia chamadas assíncronas. |
 | **`SM: SessionManager`** | State Manager | Gerenciador estático em memória que armazena a sessão ativa (`CurrentUser`, `AccessToken`, `PersonagemAtivo`). |
 | **`SRV: Backend API`** | Controller / Endpoint | API Node.js/Express que processa requisições REST, aplica regras de segurança, hashing e responde em JSON. |
-| **`DB: MySQL_Tronus`** | Persistência Relacional | Banco de dados que executa comandos SQL `SELECT`, `INSERT`, `UPDATE` com integridade referencial. |
-| **`TRG: Triggers / Procedures`** | Automação no Banco | Gatilhos de banco (`trg_calcular_estrelas`) que promovem o herói de patente conforme a pontuação. |
+| **`DB: PostgreSQL_Tronus`** | Persistência Relacional (Supabase) | Banco de dados relacional PostgreSQL que executa comandos SQL com integridade referencial, RLS e constraints estritas. |
+| **`TRG: Triggers / Procedures`** | Automação no Banco | Gatilhos de banco (`trg_progresso_atualiza_personagem`) que promovem o herói de patente conforme a pontuação. |
 
 ---
 
@@ -182,7 +182,7 @@ sequenceDiagram
     participant API as 🌐 API: ApiService
     participant SM as 🔐 SM: SessionManager
     participant SRV as ⚙️ SRV: BackendAuthAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
     participant MF as 🖼️ MF: MainForm
 
     Usuario->>UI: informarCredenciais(email, senha)
@@ -230,7 +230,7 @@ sequenceDiagram
 | 1-2 | Usuário | `UcLogin` | `informarCredenciais()`, `clicarEntrar()` | Síncrono | Entrada dos dados de autenticação e clique no botão. |
 | 3 | `UcLogin` | `UcLogin` | `validarCamposNaoVazios()` | Auto-chamada | Bloqueia submissão caso campos estejam em branco. |
 | 4-5 | `UcLogin` | `Backend` | `POST /auth/login` | Assíncrono | Transmite credenciais via HTTPS seguro. |
-| 6-7 | `Backend` | `MySQL` | `SELECT ... WHERE email = ?` | Síncrono | Localiza conta correspondente no banco de dados. |
+| 6-7 | `Backend` | `PostgreSQL` | `SELECT ... WHERE email = ?` | Síncrono | Localiza conta correspondente no banco de dados. |
 | 8-9 | `Backend` | `Backend` | `BCrypt.Verify()` / `gerarTokenJWT()` | Auto-chamada | Valida hash da senha e emite o token assinado. |
 | 10-12 | `Backend` | `UcLogin` | `200 OK` $\rightarrow$ `SessionManager.Login()` | Retorno | Armazena token na sessão ativa do cliente. |
 | 13-16 | `UcLogin` | `Backend` | `GET /personagens/me` | Assíncrono | Inspeciona se o estudante já forjou seu personagem. |
@@ -249,7 +249,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcRegister
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendAuthAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
     participant MF as 🖼️ MF: MainForm
 
     Calouro->>UI: preencherFormulario(nome, email, celular, senha, confirma)
@@ -283,8 +283,8 @@ sequenceDiagram
 | 1-2 | Calouro | `UcRegister` | `preencherFormulario()`, `clicarForjarConta()` | Síncrono | Entrada cadastral completa do estudante. |
 | 3 | `UcRegister` | `UcRegister` | `validarFormulario()` | Auto-chamada | Checagem de regex de e-mail e conferência de senha dupla. |
 | 4-5 | `UcRegister` | `Backend` | `POST /auth/register` | Assíncrono | Envio da requisição de cadastro via HTTP JSON. |
-| 6-7 | `Backend` | `MySQL` | `SELECT id WHERE email = ?` | Síncrono | Garante unicidade cadastral no banco. |
-| 8-9 | `Backend` | `MySQL` | `INSERT INTO usuarios (...)` | Síncrono | Persiste o novo usuário com papel `'aluno'`. |
+| 6-7 | `Backend` | `PostgreSQL` | `SELECT id WHERE email = ?` | Síncrono | Garante unicidade cadastral no banco. |
+| 8-9 | `Backend` | `PostgreSQL` | `INSERT INTO usuarios (...)` | Síncrono | Persiste o novo usuário com papel `'aluno'`. |
 | 10-12 | `Backend` | `MainForm` | `LoadControl(new UcCharacter())` | Síncrono | Direciona o novo estudante diretamente para criar seu herói. |
 
 ---
@@ -300,7 +300,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcForgotPassword
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendAuthAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
     participant MF as 🖼️ MF: MainForm
 
     Usuario->>UI: informarEmailECelular(email, celular)
@@ -334,8 +334,8 @@ sequenceDiagram
 | 1-3 | Usuário | `UcForgotPassword` | `informarEmailECelular()`, `digitarNovaSenha()` | Síncrono | Fornecimento dos fatores de validação e da nova senha. |
 | 4 | `UcForgotPassword` | `UcForgotPassword` | `validarSenhasIguais()` | Auto-chamada | Verificação de conformidade no cliente. |
 | 5-6 | `UcForgotPassword` | `Backend` | `POST /auth/forgot-password` | Assíncrono | Requisição de redefinição para a API. |
-| 7-8 | `Backend` | `MySQL` | `SELECT WHERE email = ? AND celular = ?` | Síncrono | Validação cruzada de segurança no banco de dados. |
-| 9-10 | `Backend` | `MySQL` | `UPDATE usuarios SET senha_hash = ?` | Síncrono | Atualização do novo hash de senha. |
+| 7-8 | `Backend` | `PostgreSQL` | `SELECT WHERE email = ? AND celular = ?` | Síncrono | Validação cruzada de segurança no banco de dados. |
+| 9-10 | `Backend` | `PostgreSQL` | `UPDATE usuarios SET senha_hash = ?` | Síncrono | Atualização do novo hash de senha. |
 | 11-14 | `UcForgotPassword` | `MainForm` | `LoadControl(new UcLogin())` | Síncrono | Redirecionamento automático para a tela de Login. |
 
 ---
@@ -351,7 +351,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcCharacter
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendHeroAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
     participant MF as 🖼️ MF: MainForm
 
     Estudante->>UI: selecionarGenero("male" / "female")
@@ -359,11 +359,11 @@ sequenceDiagram
     Estudante->>UI: digitarNomeHeroi("Sir Arthur")
     Estudante->>UI: clicarConsagrarHeroi()
     UI->>UI: validarNomeHeroi(min 3 caracteres)
-    UI->>API: PostAsync<PersonagemDto>("/personagens/me", req)
-    API->>SRV: HTTP POST /personagens/me [Bearer JWT]
+    UI->>API: PostAsync<PersonagemDto>("/personagens", req)
+    API->>SRV: HTTP POST /personagens [Bearer JWT]
     SRV->>DB: INSERT INTO personagens (usuario_id, nome, genero, avatar, titulo_atual, total_estrelas) VALUES (?, ?, ?, ?, 'Plebeu', 0)
     DB-->>SRV: novoPersonagemId
-    SRV->>DB: INSERT INTO progresso_fases (personagem_id, fase_id, estrelas, pontuacao_maxima) VALUES (?, 1, 0, 0)
+    SRV->>DB: INSERT INTO progresso_fases (personagem_id, fase_id, estrelas) VALUES (?, 1, 0)
     DB-->>SRV: progressoInicialSalvo
     SRV-->>API: 201 Created (PersonagemDto)
     API-->>UI: PersonagemDto
@@ -376,9 +376,9 @@ sequenceDiagram
 | :-: | :--- | :--- | :--- | :---: | :--- |
 | 1-3 | Estudante | `UcCharacter` | `selecionarGenero()`, `escolherAvatar()`, `digitarNomeHeroi()` | Síncrono | Customização interativa do avatar e nome medieval. |
 | 4-5 | `UcCharacter` | `UcCharacter` | `validarNomeHeroi()` | Auto-chamada | Garante preenchimento e regras de nomenclatura. |
-| 6-7 | `UcCharacter` | `Backend` | `POST /personagens/me` | Assíncrono | Envia payload com gênero, avatar e nome do herói. |
-| 8-9 | `Backend` | `MySQL` | `INSERT INTO personagens (...)` | Síncrono | Insere o herói com 0 estrelas e patente de Plebeu. |
-| 10-11 | `Backend` | `MySQL` | `INSERT INTO progresso_fases (...)` | Síncrono | Inicializa o registro de fases desbloqueadas. |
+| 6-7 | `UcCharacter` | `Backend` | `POST /personagens` | Assíncrono | Envia payload com gênero, avatar e nome do herói. |
+| 8-9 | `Backend` | `PostgreSQL` | `INSERT INTO personagens (...)` | Síncrono | Insere o herói com 0 estrelas e patente de Plebeu. |
+| 10-11 | `Backend` | `PostgreSQL` | `INSERT INTO progresso_fases (...)` | Síncrono | Inicializa o registro de fases desbloqueadas. |
 | 12-14 | `UcCharacter` | `MainForm` | `LoadControl(new UcReinos())` | Síncrono | Encaminha o novo herói ao Mapa dos Reinos. |
 
 ---
@@ -395,7 +395,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcReinos
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendReinosAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
 
     MF->>UI: inicializarTela()
     par Carregar Reinos e Progresso
@@ -450,8 +450,8 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcQuiz
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendQuizAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
-    participant TRG as ⚡ TRG: trg_calcular_estrelas
+    participant DB as 🐘 DB: PostgreSQL_Tronus
+    participant TRG as ⚡ TRG: trg_progresso_atualiza_personagem
 
     MF->>UI: carregarFase(faseId)
     UI->>API: GetAsync<FaseQuestoesDto>("/fases/{id}/questoes")
@@ -469,12 +469,12 @@ sequenceDiagram
         UI->>UI: proximaQuestaoOuFinalizar()
     end
     
-    UI->>API: PostAsync<SubmissaoQuizDto, ResultadoFaseDto>("/fases/{id}/respostas", respostas)
-    API->>SRV: HTTP POST /fases/{id}/respostas
-    SRV->>DB: INSERT INTO respostas_tentativas (personagem_id, questao_id, alternativa_id, correta) VALUES (...)
-    SRV->>DB: INSERT INTO progresso_fases (personagem_id, fase_id, estrelas) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE estrelas = GREATEST(estrelas, VALUES(estrelas))
+    UI->>API: PostAsync<EnviarRespostasRequest, ResultadoQuizResponse>("/fases/{id}/responder", payload)
+    API->>SRV: HTTP POST /fases/{id}/responder
+    SRV->>DB: INSERT INTO respostas_usuario (personagem_id, questao_id, fase_id, acertou) VALUES (...)
+    SRV->>DB: CALL sp_registrar_progresso(?, ?, ?)  -- ON CONFLICT DO UPDATE SET estrelas = GREATEST(...)
     
-    DB->>TRG: Disparo: trg_calcular_estrelas_AFTER_UPDATE
+    DB->>TRG: Disparo: trg_progresso_atualiza_personagem
     TRG->>DB: UPDATE personagens SET total_estrelas = (SELECT SUM(estrelas)...), titulo_atual = sp_obter_titulo(...)
     DB-->>SRV: Resultado Persistido
     SRV-->>API: 200 OK { estrelas, totalEstrelas, novoTitulo, xpGanho }
@@ -489,9 +489,9 @@ sequenceDiagram
 | :-: | :--- | :--- | :--- | :---: | :--- |
 | 1-6 | `MainForm` | `Backend` | `GET /fases/{id}/questoes` | Assíncrono | Carrega questões e alternativas embaralhadas. |
 | 7-10 | Estudante | `UcQuiz` | `selecionarAlternativa()`, `clicarConfirmar()` | Síncrono | Registro da escolha e ativação de som/animação. |
-| 11-12 | `UcQuiz` | `Backend` | `POST /fases/{id}/respostas` | Assíncrono | Submete todas as respostas ao final da fase. |
-| 13-14 | `Backend` | `MySQL` | `INSERT ... ON DUPLICATE KEY UPDATE GREATEST` | Síncrono | Persiste o melhor score conquistado pelo aluno. |
-| 15-16 | `MySQL` | `Trigger` | `trg_calcular_estrelas` | Gatilho DB | Promove patente nobiliárquica no banco de dados. |
+| 11-12 | `UcQuiz` | `Backend` | `POST /fases/{id}/responder` | Assíncrono | Submete todas as respostas ao final da fase. |
+| 13-14 | `Backend` | `PostgreSQL` | `sp_registrar_progresso (GREATEST)` | Síncrono | Persiste o melhor score conquistado pelo aluno via procedure atômica. |
+| 15-16 | `PostgreSQL` | `Trigger` | `trg_progresso_atualiza_personagem` | Gatilho DB | Promove patente nobiliárquica no banco de dados. |
 | 17-20 | `UcQuiz` | `MainForm` | `exibirModalVitoria()` $\rightarrow$ `LoadControl(UcReinos)` | Síncrono | Exibe premiações e retorna ao mapa curricular. |
 
 ---
@@ -508,7 +508,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcDashboard
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendStatsAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
 
     MF->>UI: inicializarDashboard()
     UI->>API: GetAsync<DashboardDto>("/dashboard/me")
@@ -531,7 +531,7 @@ sequenceDiagram
 | :-: | :--- | :--- | :--- | :---: | :--- |
 | 1 | `MainForm` | `UcDashboard` | `inicializarDashboard()` | Síncrono | Instancia a tela de estatísticas do aluno. |
 | 2-3 | `UcDashboard` | `Backend` | `GET /dashboard/me` | Assíncrono | Requisita consolidado pedagógico do estudante logado. |
-| 4-7 | `Backend` | `MySQL` | `SELECT personagens`, `SELECT progresso_fases` | Síncrono | Executa agregações (`SUM`, `COUNT`, `GROUP BY`). |
+| 4-7 | `Backend` | `PostgreSQL` | `SELECT personagens`, `SELECT progresso_fases` | Síncrono | Executa agregações (`SUM`, `COUNT`, `GROUP BY`). |
 | 8-9 | `Backend` | `UcDashboard` | `200 OK (DashboardDto)` | Retorno | Devolve métricas estruturadas em JSON. |
 | 10-11 | `UcDashboard` | `UcDashboard` | `atualizarBarraTituloNobiliarquico()` | Auto-chamada | Atualiza progresso visual (ex: 22/30 estrelas para Duque). |
 | 12-14 | Estudante | `MainForm` | `LoadControl(new UcReinos())` | Síncrono | Retorna o estudante ao ciclo de estudos práticos. |
@@ -549,7 +549,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcRanking
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendRankingAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
 
     Estudante->>UI: abrirTelaRanking()
     UI->>API: GetAsync<RankingResponse>("/ranking?reinoId=all")
@@ -576,7 +576,7 @@ sequenceDiagram
 | Passo | Origem | Destino | Mensagem / Operação | Tipo | Descrição |
 | :-: | :--- | :--- | :--- | :---: | :--- |
 | 1-3 | Estudante | `Backend` | `GET /ranking?reinoId=all` | Assíncrono | Solicita o leaderboard global acadêmico. |
-| 4-5 | `Backend` | `MySQL` | `SELECT ... ORDER BY total_estrelas DESC` | Síncrono | Ordena os calouros mais dedicados no banco. |
+| 4-5 | `Backend` | `PostgreSQL` | `SELECT ... ORDER BY total_estrelas DESC` | Síncrono | Ordena os calouros mais dedicados no banco. |
 | 6-8 | `Backend` | `UcRanking` | `200 OK (RankingResponse)` | Retorno | Retorna o Top 50 e a posição do usuário solicitante. |
 | 9-10 | `UcRanking` | `UcRanking` | `renderizarPodioTop3()` | Auto-chamada | Destaca o pódio com coroas e louros visuais. |
 | 11-14 | Estudante | `UcRanking` | `filtrarPorReino(2)` | Opcional | Permite ver quem lidera em Python, C++, etc. |
@@ -595,7 +595,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcProfessor
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendProfessorAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
 
     MF->>UI: carregarPainelDocente()
     UI->>API: GetAsync<ProfResumoDto>("/professor/resumo")
@@ -608,11 +608,11 @@ sequenceDiagram
     Professor->>UI: preencherNovaQuestao(reinoId, faseId, enunciado, alternativas, gabarito)
     Professor->>UI: clicarSalvarQuestao()
     UI->>UI: validarCamposEGabarito()
-    UI->>API: PostAsync<NovaQuestaoDto>("/professor/questoes", novaQuestao)
-    API->>SRV: HTTP POST /professor/questoes
-    SRV->>DB: INSERT INTO questoes (fase_id, enunciado, nivel_dificuldade, ordem) VALUES (?, ?, ?, ?)
+    UI->>API: PostAsync<NovaQuestaoDto>("/fases/{id}/questoes", novaQuestao)
+    API->>SRV: HTTP POST /fases/{id}/questoes
+    SRV->>DB: INSERT INTO questoes (fase_id, enunciado, nivel_dificuldade) VALUES (?, ?, ?)
     DB-->>SRV: novaQuestaoId
-    SRV->>DB: INSERT INTO alternativas (questao_id, letra, texto, is_correta) VALUES (?, ?, ?, ?)
+    SRV->>DB: INSERT INTO alternativas (questao_id, letra, texto, correta) VALUES (?, ?, ?, ?)
     DB-->>SRV: alternativasInseridas
     SRV-->>API: 201 Created { id: novaQuestaoId }
     API-->>UI: Sucesso
@@ -626,8 +626,8 @@ sequenceDiagram
 | 1-5 | `MainForm` | `Backend` | `GET /professor/resumo` | Assíncrono | Carrega estatísticas de adesão das turmas. |
 | 6-7 | Professor | `UcProfessor` | `preencherNovaQuestao()`, `clicarSalvarQuestao()` | Síncrono | Elaboração pedagógica do desafio e do gabarito. |
 | 8 | `UcProfessor` | `UcProfessor` | `validarCamposEGabarito()` | Auto-chamada | Confirma presença de pelo menos 1 alternativa correta. |
-| 9-10 | `UcProfessor` | `Backend` | `POST /professor/questoes` | Assíncrono | Envio do payload com questão e alternativas. |
-| 11-14 | `Backend` | `MySQL` | `INSERT INTO questoes`, `INSERT INTO alternativas` | Síncrono | Gravação relacional em cascata no banco. |
+| 9-10 | `UcProfessor` | `Backend` | `POST /fases/{id}/questoes` | Assíncrono | Envio do payload com questão e alternativas. |
+| 11-14 | `Backend` | `PostgreSQL` | `INSERT INTO questoes`, `INSERT INTO alternativas` | Síncrono | Gravação relacional em cascata no banco. |
 | 15-18 | `UcProfessor` | Professor | `atualizarGradeQuestoes()` $\rightarrow$ Notificação | Retorno | Confirmação de inclusão do exercício no quiz dos alunos. |
 
 ---
@@ -644,7 +644,7 @@ sequenceDiagram
     participant UI as 🖥️ UI: UcAdmin
     participant API as 🌐 API: ApiService
     participant SRV as ⚙️ SRV: BackendAdminAPI
-    participant DB as 🗄️ DB: MySQL_Tronus
+    participant DB as 🐘 DB: PostgreSQL_Tronus
 
     MF->>UI: carregarPainelAdmin()
     UI->>API: GetAsync<AdminOverviewDto>("/admin/overview")
@@ -679,7 +679,7 @@ sequenceDiagram
 | 1-5 | `MainForm` | `Backend` | `GET /admin/overview` | Assíncrono | Carrega contadores globais do sistema. |
 | 6-10 | Admin | `Backend` | `GET /admin/usuarios?papel=aluno` | Assíncrono | Lista e filtra usuários por papel e status. |
 | 11-13 | Admin | `Backend` | `PUT /admin/usuarios/15/role` | Assíncrono | Altera a função de um usuário para professor/admin. |
-| 14-15 | `Backend` | `MySQL` | `UPDATE usuarios SET papel = ?` | Síncrono | Persiste alteração de permissão na base de dados. |
+| 14-15 | `Backend` | `PostgreSQL` | `UPDATE usuarios SET papel = ?` | Síncrono | Persiste alteração de permissão na base de dados. |
 | 16-18 | `UcAdmin` | Admin | `atualizarGridUsuarios()` $\rightarrow$ Notificação | Retorno | Confirmação em tela do comando administrativo. |
 
 ---
@@ -740,7 +740,7 @@ A matriz abaixo estabelece a rastreabilidade bidirecional dos requisitos e casos
 | **UC06: Responder Desafio / Quiz** | `UcQuiz` | `DS07 - Desafio e Quiz` | `questoes`, `alternativas`, `respostas_tentativas` |
 | **UC07: Avaliar e Pontuar Respostas** | `UcQuiz` (Trigger) | `DS07 - Desafio e Quiz` | `progresso_fases`, `personagens` |
 | **UC08: Desbloquear Nova Fase** | `UcReinos` & `UcQuiz` | `DS06` e `DS07` | `fases`, `progresso_fases` |
-| **UC09: Promover Título Nobiliárquico** | Banco de Dados / `UcQuiz` | `DS07` e `DS08` | `personagens`, `trg_calcular_estrelas` |
+| **UC09: Promover Título Nobiliárquico** | Banco de Dados / `UcQuiz` | `DS07` e `DS08` | `personagens`, `trg_progresso_atualiza_personagem` |
 | **UC10: Visualizar Desempenho** | `UcDashboard` (`dashboard.html`) | `DS08 - Dashboard do Aluno` | `personagens`, `progresso_fases`, `reinos` |
 | **UC11: Acompanhar Classificação** | `UcRanking` | `DS09 - Ranking Academico` | `personagens`, `usuarios` |
 | **UC12: Gestão Pedagógica Docente** | `UcProfessor` (`professor.html`) | `DS10 - Painel do Professor` | `questoes`, `alternativas`, `fases` |
