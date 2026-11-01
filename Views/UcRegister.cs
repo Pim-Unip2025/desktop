@@ -33,6 +33,8 @@ namespace TronusDesktop.Views
 
         public UcRegister()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             SetupUI();
         }
@@ -286,6 +288,10 @@ namespace TronusDesktop.Views
 
                 var res = await TronusDesktop.Services.ApiService.Instance.PostAsync<TronusDesktop.Models.CadastroRequest, TronusDesktop.Models.AuthResponse>("/auth/register", req);
 
+                if (res?.Usuario != null)
+                {
+                    TronusDesktop.Services.OfflineDataService.RegistrarOuAtualizarUsuario(res.Usuario);
+                }
                 TronusDesktop.Services.SessionManager.Login(res);
                 
                 // Navegação para a próxima tela

@@ -23,6 +23,8 @@ namespace TronusDesktop.Views
 
         public UcRanking()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             SetupUI();
         }

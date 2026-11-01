@@ -27,10 +27,11 @@ Abaixo estão os links de acesso direto aos artefatos de modelagem, arquitetura 
 | Artefato / Documento | Link de Acesso | Descrição e Finalidade Acadêmica |
 | :--- | :---: | :--- |
 | 📖 **Documentação do Software** | [**`SoftwareDocument.md`**](SoftwareDocument.md) | Especificação técnica completa da aplicação desktop: arquitetura Thin Client, consumo de APIs, modelos de dados, componentes visuais, tratamento de erros e ciclo de vida. |
-| 🏛️ **Diagrama de Classes (UML)** | [**`DiagramaDeClasses.md`**](DiagramaDeClasses.md) | Modelagem estática do domínio com entidades, DTOs, métodos, atributos, relacionamentos em Mermaid e tutorial passo a passo para o software **Astah UML**. |
+| 🏛️ **Diagrama de Classes (UML)** | [**`DiagramaDeClasses.md`**](DiagramaDeClasses.md) | Modelagem estática do domínio (`DC01`) e arquitetura Desktop (`DC02`), relacionamentos em Mermaid, imagens PNG e projetos **Astah UML (`DiagramasDeClasses.asta` e `.astah`)**. |
 | 📐 **Diagrama de Casos de Uso (UML)** | [**`DiagramaDeCasosDeUso.md`**](DiagramaDeCasosDeUso.md) | Modelagem funcional com atores (Aluno, Professor, Administrador, Sistema), diagramas por pacote, dependências (`<<include>>`/`<<extend>>`) e matriz de rastreabilidade dos requisitos (RF01 a RF15). |
-| 🔄 **Diagramas de Sequência (UML)** | [**`DiagramaDeSequencia.md`**](DiagramaDeSequencia.md) | Modelagem comportamental e dinâmica com 11 diagramas de sequência cobrindo todas as telas, lifelines, tabelas de mensagens, regras de negócio e arquivos **Astah UML (`.asta` e `.astah`)**. |
-| 🔀 **Diagrama de Atividades (UML)** | [**`DiagramaDeAtividades.md`**](DiagramaDeAtividades.md) | Modelagem procedural dos fluxos de trabalho (DA01 a DA06), raias operacionais e arquivos **Astah UML (`DiagramasDeAtividade.asta` e `.astah`)**. |
+| 🔄 **Diagramas de Sequência (UML)** | [**`DiagramaDeSequencia.md`**](DiagramaDeSequencia.md) | Modelagem comportamental e dinâmica com 11 diagramas de sequência (`DS01` a `DS11`), lifelines, tabelas de mensagens e arquivos **Astah UML (`DiagramasDeSequencia.asta` e `.astah`)**. |
+| 🔀 **Diagrama de Atividades (UML)** | [**`DiagramaDeAtividades.md`**](DiagramaDeAtividades.md) | Modelagem procedural dos fluxos de trabalho (`DA01` a `DA06`), raias operacionais e arquivos **Astah UML (`DiagramasDeAtividades.asta` e `.astah`)**. |
+| 🗄️ **Schema do Banco de Dados** | [**`SchemaBancoDeDados.md`**](SchemaBancoDeDados.md) | Especificação completa do banco relacional PostgreSQL (Supabase), DDL, triggers e políticas RLS. |
 | 📘 **Manual do Usuário** | [**`ManualDoUsuario.md`**](ManualDoUsuario.md) | Guia ilustrado passo a passo para o usuário final em 12 capítulos, cobrindo instalação, atalhos, navegação por todas as telas e solução de dúvidas frequentes. |
 | 📊 **Apresentação Executiva (PPTX)** | [**`Apresentacao_Tronus_UML.pptx`**](Apresentacao_Tronus_UML.pptx) | Slides 16:9 widescreen para defesa acadêmica na UNIP com todos os diagramas de Casos de Uso, Atividades (DA01 a DA06) e Sequência (DS01 a DS11). |
 
@@ -88,49 +89,60 @@ A aplicação desktop consome os serviços da API REST na nuvem através das seg
 ```
 TronusDesktop/
 ├── Apresentacao_Tronus_UML.pptx # Apresentação em slides 16:9 para a Banca Examinadora
-├── DiagramaDeCasosDeUso.md     # Modelagem de Casos de Uso e Matriz RF01-RF15
-├── DiagramaDeClasses.md        # Modelagem de Classes e Guia Astah UML
-├── DiagramaDeSequencia.md      # Modelagem Dinâmica dos 11 Diagramas de Sequência
-├── DiagramaDeAtividades.md     # Modelagem Procedural de Atividades (DA01 a DA06)
-├── DiagramasDeAtividade.asta   # Projeto Astah Oficial com os 6 Diagramas de Atividades
-├── DiagramasDeAtividade.astah  # Cópia no formato .astah solicitada para entrega
-├── DiagramasDeSequencia.asta   # Projeto Astah Oficial com os 11 Diagramas de Sequência
-├── DiagramasDeSequencia.astah  # Cópia no formato .astah solicitada para entrega
-├── ManualDoUsuario.md          # Manual de Instruções e Uso da Aplicação
-├── SoftwareDocument.md         # Documentação de Arquitetura e Engenharia de Software
-├── Models/                     # DTOs de envio e resposta da API
-│   ├── ApiErrorResponse.cs     # Mapeamento de erros padronizados da API
-│   ├── AuthModels.cs           # Login, Registro, Recuperação e Dados do Usuário
-│   ├── DashboardModels.cs      # Estatísticas, KPIs e histórico de respostas
-│   ├── PersonagemModels.cs     # Criação e perfil do herói
-│   ├── QuizModels.cs           # Questões, alternativas e envio de gabarito
-│   └── ReinoModels.cs          # Matérias/Reinos e progresso por fases
-├── Services/                   # Comunicação e infraestrutura
-│   ├── ApiException.cs         # Exceção customizada com códigos e mensagens da API
-│   ├── ApiService.cs           # Singleton HTTP com injeção de JWT e roteamento offline
-│   ├── OfflineDataService.cs   # Motor autônomo em memória para o Modo Offline / Demonstração
-│   └── SessionManager.cs       # Armazenamento em memória da sessão e usuário logado
-├── UI/                         # Componentes visuais personalizados
-│   ├── Theme.cs                # Paleta dinâmica de cores, gradientes e gerenciador de acessibilidade
-│   ├── TronusButton.cs         # Botão customizado com cantos arredondados e hover
-│   ├── TronusPanel.cs          # Card medieval translúcido com borda dourada
-│   ├── PasswordToggleButton.cs # Botão vetorial GDI+ para alternar visibilidade de senhas
-│   └── AccessibilityThemeButton.cs # Botão de acessibilidade vetorial GDI+ presente em todas as telas (Modo Claro / Modo Escuro, atalhos Ctrl+T / Alt+A)
-├── Views/                      # Telas (UserControls) do sistema
-│   ├── UcLanding.cs            # Tela de boas-vindas / Hero
-│   ├── UcLogin.cs              # Autenticação de usuários com roteamento por papel
-│   ├── UcForgotPassword.cs     # Recuperação de senha em 3 etapas (SMS)
-│   ├── UcRegister.cs           # Cadastro de novo estudante
-│   ├── UcCharacter.cs          # Seleção de gênero e escolha de avatar
-│   ├── UcReinos.cs             # Mapa dos 5 reinos e fases com HUD do herói
-│   ├── UcQuiz.cs               # Desafios de combate com 5 questões pedagógicas
-│   ├── UcDashboard.cs          # Painel analítico com KPIs, gráfico por reino e tabela
-│   ├── UcRanking.cs            # Hall dos heróis com pódio e classificação geral
-│   ├── UcProfessor.cs          # Portal do professor (questões e busca de alunos)
-│   └── UcAdmin.cs              # Painel administrativo de governança global
-├── MainForm.cs                 # Formulário principal sem bordas (Container SPA)
-├── Program.cs                  # Ponto de entrada do executável Windows
-└── TronusDesktop.csproj        # Configuração do projeto (.NET 10, Windows Forms)
+├── DiagramaDeCasosDeUso.md      # Modelagem de Casos de Uso e Matriz RF01-RF15
+├── DiagramaDeClasses.md         # Modelagem de Classes (DC01 e DC02)
+├── DiagramaDeSequencia.md       # Modelagem Dinâmica dos 11 Diagramas de Sequência (DS01 a DS11)
+├── DiagramaDeAtividades.md      # Modelagem Procedural de Atividades (DA01 a DA06)
+├── SchemaBancoDeDados.md        # Especificação do Banco PostgreSQL (Supabase)
+├── DiagramasDeClasses.asta      # Projeto Astah Oficial com os Diagramas de Classes (DC01 e DC02)
+├── DiagramasDeClasses.astah     # Cópia no formato .astah
+├── DiagramasDeAtividades.asta   # Projeto Astah Oficial com os 6 Diagramas de Atividades (DA01 a DA06)
+├── DiagramasDeAtividades.astah  # Cópia no formato .astah
+├── DiagramasDeSequencia.asta    # Projeto Astah Oficial com os 11 Diagramas de Sequência (DS01 a DS11)
+├── DiagramasDeSequencia.astah   # Cópia no formato .astah
+├── Engenharia de software ágil aplicada.asta  # Projeto Astah Mestre Consolidado
+├── Engenharia de software ágil aplicada.astah # Cópia no formato .astah
+├── IMG/                         # Diagramas exportados em PNG organizados por categoria
+│   ├── DiagramaDeCasosDeUso/    # Casos de Uso (Estudante, Professor, Administrador)
+│   ├── DiagramaDeClasses/       # DC01 e DC02
+│   ├── DiagramaDeAtividades/    # DA01 a DA06
+│   └── DiagramasDeSequencia/    # DS01 a DS11
+├── ManualDoUsuario.md           # Manual de Instruções e Uso da Aplicação
+├── SoftwareDocument.md          # Documentação de Arquitetura e Engenharia de Software
+├── Models/                      # DTOs de envio e resposta da API
+│   ├── ApiErrorResponse.cs      # Mapeamento de erros padronizados da API
+│   ├── AuthModels.cs            # Login, Registro, Recuperação e Dados do Usuário
+│   ├── DashboardModels.cs       # Estatísticas, KPIs e histórico de respostas
+│   ├── PersonagemModels.cs      # Criação e perfil do herói
+│   ├── QuizModels.cs            # Questões, alternativas e envio de gabarito
+│   └── ReinoModels.cs           # Matérias/Reinos e progresso por fases
+├── Services/                    # Comunicação e infraestrutura
+│   ├── ApiException.cs          # Exceção customizada com códigos e mensagens da API
+│   ├── ApiService.cs            # Singleton HTTP com injeção de JWT e roteamento offline
+│   ├── OfflineDataService.cs    # Motor autônomo em memória para o Modo Offline / Demonstração
+│   └── SessionManager.cs        # Armazenamento em memória da sessão e usuário logado
+├── UI/                          # Componentes visuais personalizados
+│   ├── Theme.cs                 # Paleta dinâmica de cores, escala tipográfica (FontScale) e acessibilidade
+│   ├── TronusButton.cs          # Botão customizado com cantos arredondados e hover
+│   ├── TronusPanel.cs           # Card medieval translúcido com borda dourada
+│   ├── PasswordToggleButton.cs  # Botão vetorial GDI+ para alternar visibilidade de senhas
+│   └── AccessibilityThemeButton.cs # Botão de acessibilidade vetorial GDI+ presente em todas as telas
+├── Views/                       # Telas (UserControls) do sistema
+│   ├── UcLanding.cs             # Tela de boas-vindas / Hero
+│   ├── UcLogin.cs               # Autenticação de usuários com roteamento por papel
+│   ├── UcForgotPassword.cs      # Recuperação de senha em 3 etapas (SMS)
+│   ├── UcRegister.cs            # Cadastro de novo estudante
+│   ├── UcCharacter.cs           # Seleção de gênero e escolha de avatar
+│   ├── UcReinos.cs              # Mapa dos 5 reinos e fases com HUD do herói
+│   ├── UcQuiz.cs                # Desafios de combate com 5 questões pedagógicas
+│   ├── UcDashboard.cs           # Painel analítico com KPIs, gráfico por reino e tabela
+│   ├── UcRanking.cs             # Hall dos heróis com pódio e classificação geral
+│   ├── UcProfessor.cs           # Portal do professor (questões e busca de alunos)
+│   ├── UcAdmin.cs               # Painel administrativo de governança global e todos os cadastros ativos
+│   └── UcTestRunner.cs          # Central de Testes Automatizados e Homologação (QA Runner CT-01 a CT-16)
+├── MainForm.cs                  # Formulário principal sem bordas (Container SPA + Menu Setup ⚙️)
+├── Program.cs                   # Ponto de entrada do executável Windows
+└── TronusDesktop.csproj         # Configuração do projeto (.NET 10, Windows Forms)
 ```
 
 ---

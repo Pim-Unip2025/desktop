@@ -69,6 +69,8 @@ namespace TronusDesktop.Views
 
         public UcDashboard()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             SetupUI();
         }

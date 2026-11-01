@@ -9,6 +9,14 @@ namespace TronusDesktop.UI
         private int borderRadius = 8;
         public TronusPanel()
         {
+            this.SetStyle(
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw |
+                ControlStyles.SupportsTransparentBackColor,
+                true);
+            this.DoubleBuffered = true;
             this.BackColor = Color.Transparent;
         }
 

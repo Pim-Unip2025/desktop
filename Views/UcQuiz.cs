@@ -35,6 +35,9 @@ namespace TronusDesktop.Views
 
         public UcQuiz(int faseId, string faseNome, string reinoNome)
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+
             _faseId = faseId;
             _faseNome = faseNome;
             _reinoNome = reinoNome;
@@ -238,36 +241,46 @@ namespace TronusDesktop.Views
             dificuldadeLabel.Text = $"DIFICULDADE: {q.NivelDificuldade.ToUpper()}";
             enunciadoBox.Text = q.Enunciado.Replace("\r\n", Environment.NewLine).Replace("\n", Environment.NewLine);
 
-            flowAlternativas.Controls.Clear();
-
-            int marcadaId = _respostasMarcadas.ContainsKey(q.Id) ? _respostasMarcadas[q.Id] : -1;
-
-            foreach (var alt in q.Alternativas.OrderBy(a => a.Letra))
+            flowAlternativas.SuspendLayout();
+            try
             {
-                bool isSelected = alt.Id == marcadaId;
+                flowAlternativas.Controls.Clear();
 
-                var btnAlt = new Button
+                int marcadaId = _respostasMarcadas.ContainsKey(q.Id) ? _respostasMarcadas[q.Id] : -1;
+
+                foreach (var alt in q.Alternativas.OrderBy(a => a.Letra))
                 {
-                    Text = $"  [{alt.Letra}]  {alt.Texto}",
-                    Size = new Size(Math.Max(300, flowAlternativas.ClientSize.Width - 25), 45),
-                    Margin = new Padding(0, 0, 0, 8),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    Font = new Font("Segoe UI", 10.5F),
-                    FlatStyle = FlatStyle.Flat,
-                    BackColor = isSelected ? Color.FromArgb(40, 100, 60) : Color.FromArgb(30, 30, 30),
-                    ForeColor = isSelected ? Theme.Gold : Theme.PrimaryText,
-                    Cursor = Cursors.Hand
-                };
-                btnAlt.FlatAppearance.BorderColor = isSelected ? Theme.Gold : Color.FromArgb(60, 60, 60);
-                btnAlt.FlatAppearance.BorderSize = isSelected ? 2 : 1;
+                    bool isSelected = alt.Id == marcadaId;
 
-                btnAlt.Click += (s, e) =>
-                {
-                    _respostasMarcadas[q.Id] = alt.Id;
-                    ExibirQuestao(_indiceAtual); // Redesenha com a opção destacada
-                };
+                    var btnAlt = new Button
+                    {
+                        Text = $"  [{alt.Letra}]  {alt.Texto}",
+                        Size = new Size(Math.Max(300, flowAlternativas.ClientSize.Width - 25), 45),
+                        Margin = new Padding(0, 0, 0, 8),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        Font = new Font("Segoe UI", 10.5F),
+                        FlatStyle = FlatStyle.Flat,
+                        BackColor = isSelected ? Color.FromArgb(40, 100, 60) : Color.FromArgb(30, 30, 30),
+                        ForeColor = isSelected ? Theme.Gold : Theme.PrimaryText,
+                        Cursor = Cursors.Hand
+                    };
+                    btnAlt.FlatAppearance.BorderColor = isSelected ? Theme.Gold : Color.FromArgb(60, 60, 60);
+                    btnAlt.FlatAppearance.BorderSize = isSelected ? 2 : 1;
 
-                flowAlternativas.Controls.Add(btnAlt);
+                    btnAlt.Click += (s, e) =>
+                    {
+                        _respostasMarcadas[q.Id] = alt.Id;
+                        AtualizarSelecaoAlternativas(q.Id);
+                    };
+
+                    btnAlt.Tag = alt.Id;
+                    flowAlternativas.Controls.Add(btnAlt);
+                }
+            }
+            finally
+            {
+                Theme.EnableDoubleBuffering(flowAlternativas);
+                flowAlternativas.ResumeLayout(true);
             }
 
             btnAnterior.Enabled = _indiceAtual > 0;
@@ -278,6 +291,22 @@ namespace TronusDesktop.Views
             else
             {
                 btnProxima.Text = "Próxima →";
+            }
+        }
+
+        private void AtualizarSelecaoAlternativas(int questaoId)
+        {
+            int marcadaId = _respostasMarcadas.ContainsKey(questaoId) ? _respostasMarcadas[questaoId] : -1;
+            foreach (Control ctrl in flowAlternativas.Controls)
+            {
+                if (ctrl is Button btnAlt && btnAlt.Tag is int altId)
+                {
+                    bool isSelected = altId == marcadaId;
+                    btnAlt.BackColor = isSelected ? Color.FromArgb(40, 100, 60) : Color.FromArgb(30, 30, 30);
+                    btnAlt.ForeColor = isSelected ? Theme.Gold : Theme.PrimaryText;
+                    btnAlt.FlatAppearance.BorderColor = isSelected ? Theme.Gold : Color.FromArgb(60, 60, 60);
+                    btnAlt.FlatAppearance.BorderSize = isSelected ? 2 : 1;
+                }
             }
         }
 

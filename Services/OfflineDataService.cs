@@ -19,8 +19,54 @@ namespace TronusDesktop.Services
         private static List<ReinoDto> _reinos = new();
         private static List<ProgressoFaseDto> _progresso = new();
         private static Dictionary<int, List<QuestaoDto>> _questoesPorFase = new();
+        private static List<UsuarioDto> _usuarios = new();
+        private static readonly List<UsuarioDto> _usuariosCriadosNaSessao = new();
         private static int _totalRespostasOffline = 30;
         private static int _totalAcertosOffline = 26;
+
+        public static IReadOnlyList<UsuarioDto> UsuariosSistema => _usuarios;
+
+        public static void RegistrarOuAtualizarUsuario(UsuarioDto novo)
+        {
+            if (novo == null || string.IsNullOrWhiteSpace(novo.Email)) return;
+
+            var existente = _usuarios.FirstOrDefault(u => u.Email.Equals(novo.Email, StringComparison.OrdinalIgnoreCase));
+            if (existente != null)
+            {
+                existente.Nome = novo.Nome;
+                if (!string.IsNullOrWhiteSpace(novo.Papel)) existente.Papel = novo.Papel;
+                if (!string.IsNullOrWhiteSpace(novo.HeroiNome)) existente.HeroiNome = novo.HeroiNome;
+                existente.Ativo = true;
+            }
+            else
+            {
+                if (novo.Id <= 0)
+                {
+                    novo.Id = (_usuarios.Count > 0 ? _usuarios.Max(u => u.Id) : 0) + 1;
+                }
+                if (string.IsNullOrWhiteSpace(novo.DataCadastro))
+                {
+                    novo.DataCadastro = DateTime.Now.ToString("dd/MM/yyyy");
+                }
+                novo.Ativo = true;
+                _usuarios.Add(novo);
+            }
+
+            if (!_usuariosCriadosNaSessao.Any(u => u.Email.Equals(novo.Email, StringComparison.OrdinalIgnoreCase)) &&
+                !novo.Email.Equals("qa.aluno@tronus.unip.br", StringComparison.OrdinalIgnoreCase))
+            {
+                _usuariosCriadosNaSessao.Add(novo);
+            }
+        }
+
+        public static bool RemoverUsuario(int id)
+        {
+            var u = _usuarios.FirstOrDefault(x => x.Id == id);
+            if (u == null || u.Papel == "admin") return false;
+            _usuarios.Remove(u);
+            _usuariosCriadosNaSessao.RemoveAll(x => x.Id == id || x.Email.Equals(u.Email, StringComparison.OrdinalIgnoreCase));
+            return true;
+        }
 
         static OfflineDataService()
         {
@@ -88,6 +134,46 @@ namespace TronusDesktop.Services
             };
 
             CriarQuestoesPedagogicas();
+            InicializarUsuariosPadrao();
+        }
+
+        private static void InicializarUsuariosPadrao()
+        {
+            _usuarios = new List<UsuarioDto>
+            {
+                // Administradores
+                new() { Id = 1, Nome = "admin", Email = "admin@tronus.com", Papel = "admin", HeroiNome = "Guardião Supremo", DataCadastro = "01/02/2026", Ativo = true },
+                new() { Id = 2, Nome = "Admin Morgana", Email = "morgana.adm@tronus.com", Papel = "admin", HeroiNome = "Chanceler Real", DataCadastro = "01/02/2026", Ativo = true },
+
+                // Professores dos 5 Reinos Acadêmicos
+                new() { Id = 3, Nome = "prof_python", Email = "prof.python@tronus.com", Papel = "professor", ProfessorReinoId = 1, HeroiNome = "Mestre Python", DataCadastro = "02/02/2026", Ativo = true },
+                new() { Id = 4, Nome = "prof_cpp", Email = "prof.cpp@tronus.com", Papel = "professor", ProfessorReinoId = 2, HeroiNome = "Mestre C++", DataCadastro = "03/02/2026", Ativo = true },
+                new() { Id = 5, Nome = "prof_bd", Email = "prof.bd@tronus.com", Papel = "professor", ProfessorReinoId = 3, HeroiNome = "Mestre SQL", DataCadastro = "04/02/2026", Ativo = true },
+                new() { Id = 6, Nome = "prof_redes", Email = "prof.redes@tronus.com", Papel = "professor", ProfessorReinoId = 4, HeroiNome = "Mestre TCP/IP", DataCadastro = "05/02/2026", Ativo = true },
+                new() { Id = 7, Nome = "prof_engsoft", Email = "prof.engsoft@tronus.com", Papel = "professor", ProfessorReinoId = 5, HeroiNome = "Mestre UML & Scrum", DataCadastro = "06/02/2026", Ativo = true },
+
+                // Todos os Alunos Ativos (sincronizados com Ranking, Professor e Seeds)
+                new() { Id = 8, Nome = "Arthur Pendragon", Email = "arthur@unip.br", Papel = "aluno", HeroiNome = "Sir Arthur (Rei · 45★)", DataCadastro = "10/02/2026", Ativo = true },
+                new() { Id = 9, Nome = "Morgana Le Fay", Email = "morgana@unip.br", Papel = "aluno", HeroiNome = "Lady Morgana (Duquesa · 42★)", DataCadastro = "12/02/2026", Ativo = true },
+                new() { Id = 10, Nome = "Roland Deschain", Email = "roland@unip.br", Papel = "aluno", HeroiNome = "Mestre Roland (Duque · 38★)", DataCadastro = "15/02/2026", Ativo = true },
+                new() { Id = 11, Nome = "Brenda Soares", Email = "brenda@unip.br", Papel = "aluno", HeroiNome = "Valquíria Brenda (Cavaleiro · 35★)", DataCadastro = "18/02/2026", Ativo = true },
+                new() { Id = 12, Nome = "Cedric Rotherwood", Email = "cedric@unip.br", Papel = "aluno", HeroiNome = "Lorde Cedric (Cavaleiro · 33★)", DataCadastro = "20/02/2026", Ativo = true },
+                new() { Id = 13, Nome = "Beatrice Vance", Email = "beatrice@unip.br", Papel = "aluno", HeroiNome = "Maga Beatrice (Cavaleiro · 30★)", DataCadastro = "22/02/2026", Ativo = true },
+                new() { Id = 14, Nome = "Gabriel Belmont", Email = "gabriel@unip.br", Papel = "aluno", HeroiNome = "Arqueiro Gabriel (Cavaleiro · 27★)", DataCadastro = "24/02/2026", Ativo = true },
+                new() { Id = 15, Nome = "Lucas Silva", Email = "lucas.silva@unip.br", Papel = "aluno", HeroiNome = "Cavaleiro Lucas (Cavaleiro · 24★)", DataCadastro = "25/02/2026", Ativo = true },
+                new() { Id = 16, Nome = "Clarissa Ramos", Email = "clarissa@unip.br", Papel = "aluno", HeroiNome = "Lady Clarissa (Cavaleiro · 20★)", DataCadastro = "27/02/2026", Ativo = true },
+                new() { Id = 17, Nome = "Guilherme Bardo", Email = "guilherme@unip.br", Papel = "aluno", HeroiNome = "Bardo Guilherme (Cavaleiro · 18★)", DataCadastro = "01/03/2026", Ativo = true },
+                new() { Id = 18, Nome = "aluno_teste", Email = "aluno@teste.com", Papel = "aluno", HeroiNome = "Aprendiz UNIP (Plebeu · 6★)", DataCadastro = "05/03/2026", Ativo = true }
+            };
+
+            foreach (var extra in _usuariosCriadosNaSessao)
+            {
+                if (!_usuarios.Any(u => u.Email.Equals(extra.Email, StringComparison.OrdinalIgnoreCase)))
+                {
+                    extra.Id = _usuarios.Max(u => u.Id) + 1;
+                    _usuarios.Add(extra);
+                }
+            }
         }
 
         private static void CriarQuestoesPedagogicas()
@@ -372,6 +458,33 @@ namespace TronusDesktop.Services
                 return (T)(object)resumo;
             }
 
+            if (endpoint.StartsWith("/admin/usuarios"))
+            {
+                return (T)(object)_usuarios.ToList();
+            }
+
+            if (endpoint == "/admin/estatisticas")
+            {
+                int totalUsers = _usuarios.Count;
+                int totalAlunos = _usuarios.Count(u => u.Papel == "aluno");
+                int totalPersonagens = _usuarios.Count(u => u.Papel == "aluno" && !string.IsNullOrWhiteSpace(u.HeroiNome));
+                int totalQuestoes = _questoesPorFase.Values.Sum(q => q.Count);
+                decimal taxa = _totalRespostasOffline > 0
+                    ? Math.Round((decimal)_totalAcertosOffline / _totalRespostasOffline * 100m, 1)
+                    : 86.6m;
+
+                var stats = new EstatisticasAdminDto
+                {
+                    Usuarios = totalUsers,
+                    Alunos = totalAlunos,
+                    Personagens = totalPersonagens,
+                    Questoes = totalQuestoes,
+                    Respostas = _totalRespostasOffline + 380,
+                    TaxaAcerto = taxa
+                };
+                return (T)(object)stats;
+            }
+
             return default;
         }
 
@@ -422,14 +535,19 @@ namespace TronusDesktop.Services
             // 2. Registro
             if (endpoint == "/auth/register" && data is CadastroRequest regReq)
             {
+                int novoId = (_usuarios.Count > 0 ? _usuarios.Max(u => u.Id) : 100) + 1;
                 CurrentUser = new UsuarioDto
                 {
-                    Id = 202,
+                    Id = novoId,
                     Nome = regReq.Nome,
                     Email = regReq.Email,
-                    Papel = "aluno"
+                    Papel = "aluno",
+                    HeroiNome = "Em criação",
+                    DataCadastro = DateTime.Now.ToString("dd/MM/yyyy"),
+                    Ativo = true
                 };
 
+                RegistrarOuAtualizarUsuario(CurrentUser);
                 CurrentHero = null;
 
                 var authRes = new AuthResponse
@@ -454,6 +572,11 @@ namespace TronusDesktop.Services
                     TituloAtual = "Plebeu",
                     TotalEstrelas = 0
                 };
+                if (CurrentUser != null)
+                {
+                    CurrentUser.HeroiNome = $"{charReq.Nome} (Plebeu · 0★)";
+                    RegistrarOuAtualizarUsuario(CurrentUser);
+                }
                 return (TResponse)(object)CurrentHero;
             }
 

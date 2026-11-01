@@ -70,6 +70,8 @@ namespace TronusDesktop.Views
 
         public UcProfessor()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             CarregarDadosIniciais();
             SetupUI();
@@ -123,13 +125,35 @@ namespace TronusDesktop.Views
                 Explicacao = "O for em Python é um for-each natural usando a sintaxe 'for item in colecao:'."
             });
 
-            // Alunos cadastrados
+            // Alunos cadastrados (sincronizados com Ranking e Painel Admin)
             listaAlunos.Add(new AlunoItem { Nome = "Arthur Pendragon", Email = "arthur@unip.br", Heroi = "Sir Arthur", Titulo = "Rei do Código", Estrelas = 45, FasesConcluidas = 5, TaxaAcerto = 98 });
             listaAlunos.Add(new AlunoItem { Nome = "Morgana Le Fay", Email = "morgana@unip.br", Heroi = "Lady Morgana", Titulo = "Duquesa dos Dados", Estrelas = 42, FasesConcluidas = 5, TaxaAcerto = 94 });
             listaAlunos.Add(new AlunoItem { Nome = "Roland Deschain", Email = "roland@unip.br", Heroi = "Mestre Roland", Titulo = "Cavaleiro do Software", Estrelas = 38, FasesConcluidas = 4, TaxaAcerto = 90 });
             listaAlunos.Add(new AlunoItem { Nome = "Brenda Soares", Email = "brenda@unip.br", Heroi = "Valquíria Brenda", Titulo = "Cavaleiro", Estrelas = 35, FasesConcluidas = 4, TaxaAcerto = 89 });
+            listaAlunos.Add(new AlunoItem { Nome = "Cedric Rotherwood", Email = "cedric@unip.br", Heroi = "Lorde Cedric", Titulo = "Cavaleiro", Estrelas = 33, FasesConcluidas = 4, TaxaAcerto = 86 });
+            listaAlunos.Add(new AlunoItem { Nome = "Beatrice Vance", Email = "beatrice@unip.br", Heroi = "Maga Beatrice", Titulo = "Cavaleiro", Estrelas = 30, FasesConcluidas = 3, TaxaAcerto = 84 });
+            listaAlunos.Add(new AlunoItem { Nome = "Gabriel Belmont", Email = "gabriel@unip.br", Heroi = "Arqueiro Gabriel", Titulo = "Plebeu de Honra", Estrelas = 27, FasesConcluidas = 3, TaxaAcerto = 82 });
             listaAlunos.Add(new AlunoItem { Nome = "Lucas Silva", Email = "lucas.silva@unip.br", Heroi = "Cavaleiro Lucas", Titulo = "Plebeu de Honra", Estrelas = 24, FasesConcluidas = 3, TaxaAcerto = 79 });
             listaAlunos.Add(new AlunoItem { Nome = "Clarissa Ramos", Email = "clarissa@unip.br", Heroi = "Lady Clarissa", Titulo = "Plebeu", Estrelas = 20, FasesConcluidas = 2, TaxaAcerto = 76 });
+            listaAlunos.Add(new AlunoItem { Nome = "Guilherme Bardo", Email = "guilherme@unip.br", Heroi = "Bardo Guilherme", Titulo = "Plebeu", Estrelas = 18, FasesConcluidas = 2, TaxaAcerto = 73 });
+            listaAlunos.Add(new AlunoItem { Nome = "aluno_teste", Email = "aluno@teste.com", Heroi = "Aprendiz UNIP", Titulo = "Plebeu", Estrelas = 6, FasesConcluidas = 1, TaxaAcerto = 68 });
+
+            foreach (var u in OfflineDataService.UsuariosSistema.Where(x => x.Papel == "aluno"))
+            {
+                if (!listaAlunos.Any(a => a.Email.Equals(u.Email, StringComparison.OrdinalIgnoreCase)))
+                {
+                    listaAlunos.Add(new AlunoItem
+                    {
+                        Nome = u.Nome,
+                        Email = u.Email,
+                        Heroi = string.IsNullOrWhiteSpace(u.HeroiNome) ? u.Nome : u.HeroiNome,
+                        Titulo = "Plebeu",
+                        Estrelas = 0,
+                        FasesConcluidas = 0,
+                        TaxaAcerto = 0
+                    });
+                }
+            }
         }
 
         private void SetupUI()
@@ -453,99 +477,108 @@ namespace TronusDesktop.Views
 
         private void AtualizarListaQuestoes()
         {
-            flowQuestoes.Controls.Clear();
-            int faseSelecionada = cbFases.SelectedIndex + 1;
-
-            var questoesFase = listaQuestoes.Where(q => q.FaseId == faseSelecionada).ToList();
-
-            if (questoesFase.Count == 0)
+            flowQuestoes.SuspendLayout();
+            try
             {
-                var lblVazio = new Label
-                {
-                    Text = "Nenhuma questão cadastrada para esta fase ainda.\nUtilize o formulário ao lado para cadastrar.",
-                    ForeColor = Theme.DimText,
-                    Font = new Font("Segoe UI", 10F, FontStyle.Italic),
-                    Size = new Size(520, 60),
-                    TextAlign = ContentAlignment.MiddleCenter
-                };
-                flowQuestoes.Controls.Add(lblVazio);
-                return;
-            }
+                flowQuestoes.Controls.Clear();
+                int faseSelecionada = cbFases.SelectedIndex + 1;
 
-            int n = 1;
-            foreach (var q in questoesFase)
-            {
-                var card = new TronusPanel
-                {
-                    Size = new Size(520, 160),
-                    Margin = new Padding(0, 0, 0, 12),
-                    BackColor = Color.Transparent
-                };
+                var questoesFase = listaQuestoes.Where(q => q.FaseId == faseSelecionada).ToList();
 
-                var lblEnun = new Label
+                if (questoesFase.Count == 0)
                 {
-                    Text = $"Q{n}. {q.Enunciado}",
-                    ForeColor = Color.White,
-                    Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
-                    Location = new Point(12, 10),
-                    Size = new Size(420, 38),
-                    BackColor = Color.Transparent
-                };
-                card.Controls.Add(lblEnun);
-
-                var btnDel = new Button
-                {
-                    Text = "✕",
-                    ForeColor = Color.FromArgb(240, 100, 100),
-                    FlatStyle = FlatStyle.Flat,
-                    Size = new Size(30, 26),
-                    Location = new Point(475, 8),
-                    Cursor = Cursors.Hand
-                };
-                btnDel.FlatAppearance.BorderSize = 0;
-                btnDel.Click += (s, e) =>
-                {
-                    var res = MessageBox.Show("Deseja excluir esta questão pedagógica?", "Confirmar Exclusão", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-                    if (res == DialogResult.Yes)
+                    var lblVazio = new Label
                     {
-                        listaQuestoes.Remove(q);
-                        AtualizarListaQuestoes();
+                        Text = "Nenhuma questão cadastrada para esta fase ainda.\nUtilize o formulário ao lado para cadastrar.",
+                        ForeColor = Theme.DimText,
+                        Font = new Font("Segoe UI", 10F, FontStyle.Italic),
+                        Size = new Size(520, 60),
+                        TextAlign = ContentAlignment.MiddleCenter
+                    };
+                    flowQuestoes.Controls.Add(lblVazio);
+                    return;
+                }
+
+                int n = 1;
+                foreach (var q in questoesFase)
+                {
+                    var card = new TronusPanel
+                    {
+                        Size = new Size(520, 160),
+                        Margin = new Padding(0, 0, 0, 12),
+                        BackColor = Color.Transparent
+                    };
+
+                    var lblEnun = new Label
+                    {
+                        Text = $"Q{n}. {q.Enunciado}",
+                        ForeColor = Color.White,
+                        Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                        Location = new Point(12, 10),
+                        Size = new Size(420, 38),
+                        BackColor = Color.Transparent
+                    };
+                    card.Controls.Add(lblEnun);
+
+                    var btnDel = new Button
+                    {
+                        Text = "✕",
+                        ForeColor = Color.FromArgb(240, 100, 100),
+                        FlatStyle = FlatStyle.Flat,
+                        Size = new Size(30, 26),
+                        Location = new Point(475, 8),
+                        Cursor = Cursors.Hand
+                    };
+                    btnDel.FlatAppearance.BorderSize = 0;
+                    btnDel.Click += (s, e) =>
+                    {
+                        var res = MessageBox.Show("Deseja excluir esta questão pedagógica?", "Confirmar Exclusão", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (res == DialogResult.Yes)
+                        {
+                            listaQuestoes.Remove(q);
+                            AtualizarListaQuestoes();
+                        }
+                    };
+                    card.Controls.Add(btnDel);
+
+                    // Alternativas
+                    int yOpt = 48;
+                    for (int i = 0; i < q.Alternativas.Length; i++)
+                    {
+                        char letra = (char)('A' + i);
+                        bool isCorreta = (i == q.CorretaIndex);
+                        var lblOpt = new Label
+                        {
+                            Text = $"{letra}) {q.Alternativas[i]} {(isCorreta ? "✓ (GABARITO)" : "")}",
+                            ForeColor = isCorreta ? Color.FromArgb(130, 225, 130) : Theme.DimText,
+                            Font = new Font("Segoe UI", 8.5F, isCorreta ? FontStyle.Bold : FontStyle.Regular),
+                            Location = new Point(15, yOpt),
+                            Size = new Size(490, 20),
+                            BackColor = Color.Transparent
+                        };
+                        card.Controls.Add(lblOpt);
+                        yOpt += 20;
                     }
-                };
-                card.Controls.Add(btnDel);
 
-                // Alternativas
-                int yOpt = 48;
-                for (int i = 0; i < q.Alternativas.Length; i++)
-                {
-                    char letra = (char)('A' + i);
-                    bool isCorreta = (i == q.CorretaIndex);
-                    var lblOpt = new Label
+                    var lblExp = new Label
                     {
-                        Text = $"{letra}) {q.Alternativas[i]} {(isCorreta ? "✓ (GABARITO)" : "")}",
-                        ForeColor = isCorreta ? Color.FromArgb(130, 225, 130) : Theme.DimText,
-                        Font = new Font("Segoe UI", 8.5F, isCorreta ? FontStyle.Bold : FontStyle.Regular),
-                        Location = new Point(15, yOpt),
+                        Text = $"💡 Explicação: {q.Explicacao}",
+                        ForeColor = Theme.Gold,
+                        Font = new Font("Segoe UI", 8F, FontStyle.Italic),
+                        Location = new Point(15, 132),
                         Size = new Size(490, 20),
                         BackColor = Color.Transparent
                     };
-                    card.Controls.Add(lblOpt);
-                    yOpt += 20;
+                    card.Controls.Add(lblExp);
+
+                    flowQuestoes.Controls.Add(card);
+                    n++;
                 }
-
-                var lblExp = new Label
-                {
-                    Text = $"💡 Explicação: {q.Explicacao}",
-                    ForeColor = Theme.Gold,
-                    Font = new Font("Segoe UI", 8F, FontStyle.Italic),
-                    Location = new Point(15, 132),
-                    Size = new Size(490, 20),
-                    BackColor = Color.Transparent
-                };
-                card.Controls.Add(lblExp);
-
-                flowQuestoes.Controls.Add(card);
-                n++;
+            }
+            finally
+            {
+                Theme.EnableDoubleBuffering(flowQuestoes);
+                flowQuestoes.ResumeLayout(true);
             }
         }
 
@@ -692,32 +725,41 @@ namespace TronusDesktop.Views
 
         private void FiltrarTabelaAlunos()
         {
-            listAlunosPanel.Controls.Clear();
-            string termo = txtBuscaAluno.Text.Trim().ToLower();
-
-            var filtrados = listaAlunos
-                .Where(a => string.IsNullOrEmpty(termo) || a.Nome.ToLower().Contains(termo) || a.Email.ToLower().Contains(termo))
-                .ToList();
-
-            int y = 5;
-            foreach (var a in filtrados)
+            listAlunosPanel.SuspendLayout();
+            try
             {
-                var row = new Panel
+                listAlunosPanel.Controls.Clear();
+                string termo = txtBuscaAluno.Text.Trim().ToLower();
+
+                var filtrados = listaAlunos
+                    .Where(a => string.IsNullOrEmpty(termo) || a.Nome.ToLower().Contains(termo) || a.Email.ToLower().Contains(termo))
+                    .ToList();
+
+                int y = 5;
+                foreach (var a in filtrados)
                 {
-                    Location = new Point(5, y),
-                    Size = new Size(930, 36),
-                    BackColor = (y % 72 == 5) ? Color.FromArgb(20, 255, 255, 255) : Color.Transparent
-                };
+                    var row = new Panel
+                    {
+                        Location = new Point(5, y),
+                        Size = new Size(930, 36),
+                        BackColor = (y % 72 == 5) ? Color.FromArgb(20, 255, 255, 255) : Color.Transparent
+                    };
 
-                row.Controls.Add(CriarLabelAluno(a.Nome, 10, 220, Color.White, true));
-                row.Controls.Add(CriarLabelAluno(a.Email, 235, 200, Theme.DimText, false));
-                row.Controls.Add(CriarLabelAluno($"{a.Heroi} ({a.Titulo})", 445, 180, Theme.Gold, false));
-                row.Controls.Add(CriarLabelAluno($"⭐ {a.Estrelas}", 635, 100, Theme.Gold, true));
-                row.Controls.Add(CriarLabelAluno($"{a.FasesConcluidas} / 5", 745, 80, Theme.PrimaryText, false));
-                row.Controls.Add(CriarLabelAluno($"{a.TaxaAcerto}% acertos", 835, 110, Color.FromArgb(130, 220, 130), true));
+                    row.Controls.Add(CriarLabelAluno(a.Nome, 10, 220, Color.White, true));
+                    row.Controls.Add(CriarLabelAluno(a.Email, 235, 200, Theme.DimText, false));
+                    row.Controls.Add(CriarLabelAluno($"{a.Heroi} ({a.Titulo})", 445, 180, Theme.Gold, false));
+                    row.Controls.Add(CriarLabelAluno($"⭐ {a.Estrelas}", 635, 100, Theme.Gold, true));
+                    row.Controls.Add(CriarLabelAluno($"{a.FasesConcluidas} / 5", 745, 80, Theme.PrimaryText, false));
+                    row.Controls.Add(CriarLabelAluno($"{a.TaxaAcerto}% acertos", 835, 110, Color.FromArgb(130, 220, 130), true));
 
-                listAlunosPanel.Controls.Add(row);
-                y += 38;
+                    listAlunosPanel.Controls.Add(row);
+                    y += 38;
+                }
+            }
+            finally
+            {
+                Theme.EnableDoubleBuffering(listAlunosPanel);
+                listAlunosPanel.ResumeLayout(true);
             }
         }
 

@@ -24,6 +24,8 @@ namespace TronusDesktop.Views
 
         public UcCharacter()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             SetupUI();
         }
@@ -217,6 +219,12 @@ namespace TronusDesktop.Views
                     };
 
                     var res = await TronusDesktop.Services.ApiService.Instance.PostAsync<TronusDesktop.Models.CriarPersonagemRequest, TronusDesktop.Models.PersonagemDto>("/personagens", req);
+
+                    if (TronusDesktop.Services.SessionManager.CurrentUser != null && res != null)
+                    {
+                        TronusDesktop.Services.SessionManager.CurrentUser.HeroiNome = $"{res.Nome} ({res.TituloAtual} · {res.TotalEstrelas}★)";
+                        TronusDesktop.Services.OfflineDataService.RegistrarOuAtualizarUsuario(TronusDesktop.Services.SessionManager.CurrentUser);
+                    }
 
                     MessageBox.Show($"Personagem {res.Nome} criado!\nTítulo: {res.TituloAtual}", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     

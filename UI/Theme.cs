@@ -1,17 +1,26 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace TronusDesktop.UI
 {
     /// <summary>
     /// Gerenciador central de temas e acessibilidade visual da aplicação Tronus Desktop.
-    /// Oferece alternância dinâmica entre o Modo Escuro (Dark Fantasy) e o Modo Claro (Parchment Acessível de Alto Contraste).
+    /// Oferece alternância dinâmica entre o Modo Escuro (Dark Fantasy), Modo Claro (Parchment Acessível de Alto Contraste)
+    /// e Escalonamento Dinâmico de Fonte (A+ / A-) para Acessibilidade Visual.
     /// </summary>
     public static class Theme
     {
         public static bool IsDarkMode { get; private set; } = true;
+        public static float FontScale { get; private set; } = 1.0f;
+        public const float MinFontScale = 0.85f;
+        public const float MaxFontScale = 1.45f;
+        public const float FontScaleStep = 0.10f;
+
+        private static readonly ConditionalWeakTable<Control, Font> _baseFonts = new();
+
         public static event Action? ThemeChanged;
 
         // ═══════════════════════════════════════════════════
@@ -66,6 +75,59 @@ namespace TronusDesktop.UI
             ThemeChanged?.Invoke();
         }
 
+        /// <summary>
+        /// Aumenta o tamanho da fonte de toda a interface para acessibilidade visual (+10%).
+        /// </summary>
+        public static void IncreaseFontSize()
+        {
+            SetFontScale((float)Math.Round(Math.Min(MaxFontScale, FontScale + FontScaleStep), 2));
+        }
+
+        /// <summary>
+        /// Diminui o tamanho da fonte de toda a interface (-10%).
+        /// </summary>
+        public static void DecreaseFontSize()
+        {
+            SetFontScale((float)Math.Round(Math.Max(MinFontScale, FontScale - FontScaleStep), 2));
+        }
+
+        /// <summary>
+        /// Restaura o tamanho padrão da fonte (100%).
+        /// </summary>
+        public static void ResetFontSize()
+        {
+            SetFontScale(1.0f);
+        }
+
+        /// <summary>
+        /// Define a escala global de fonte (entre 85% e 145%) e atualiza a tela ativa.
+        /// </summary>
+        public static void SetFontScale(float scale)
+        {
+            float clamped = Math.Clamp(scale, MinFontScale, MaxFontScale);
+            if (Math.Abs(FontScale - clamped) < 0.001f) return;
+
+            FontScale = clamped;
+            ThemeChanged?.Invoke();
+        }
+
+        private static void ApplyFontScaleToControl(Control ctrl)
+        {
+            if (ctrl == null || ctrl.Font == null) return;
+
+            if (!_baseFonts.TryGetValue(ctrl, out Font? baseFont) || baseFont == null)
+            {
+                baseFont = ctrl.Font;
+                _baseFonts.Add(ctrl, baseFont);
+            }
+
+            float targetSize = (float)Math.Round(Math.Clamp(baseFont.Size * FontScale, 6.5f, 36f), 1);
+            if (Math.Abs(ctrl.Font.Size - targetSize) > 0.15f)
+            {
+                ctrl.Font = new Font(baseFont.FontFamily, targetSize, baseFont.Style, baseFont.Unit);
+            }
+        }
+
         private static void ApplyDarkPalette()
         {
             Background = Color.FromArgb(26, 26, 26);
@@ -108,12 +170,36 @@ namespace TronusDesktop.UI
         }
 
         /// <summary>
+        /// Ativa o DoubleBuffered (via reflexão quando protegido) em toda a árvore de controles
+        /// para eliminar cintilação (flicker) de renderização GDI+ e imagens de fundo.
+        /// </summary>
+        public static void EnableDoubleBuffering(Control control)
+        {
+            if (control == null) return;
+
+            if (!SystemInformation.TerminalServerSession)
+            {
+                var prop = typeof(Control).GetProperty("DoubleBuffered",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                prop?.SetValue(control, true, null);
+            }
+
+            foreach (Control child in control.Controls)
+            {
+                EnableDoubleBuffering(child);
+            }
+        }
+
+        /// <summary>
         /// Aplica as cores do tema ativo de forma recursiva a qualquer árvore de controles do Windows Forms.
         /// Preserva dados digitados e estado de foco dos componentes.
         /// </summary>
         public static void ApplyTheme(Control root)
         {
             if (root == null) return;
+
+            EnableDoubleBuffering(root);
+            ApplyFontScaleToControl(root);
 
             // Tratamento de UserControl e Form:
             // O plano de fundo (BackgroundImage/papel de parede) é estritamente PRESERVADO

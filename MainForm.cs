@@ -28,6 +28,7 @@ namespace TronusDesktop
         private Panel topBar;
         private Label titleLabel;
         private Panel windowButtonsPanel;
+        private Button btnSetup;
         private Button btnOfflineStatus;
         private AccessibilityThemeButton btnTheme;
         private Button btnMinimize;
@@ -39,9 +40,28 @@ namespace TronusDesktop
 
         public MainForm()
         {
+            this.SetStyle(
+                ControlStyles.UserPaint |
+                ControlStyles.AllPaintingInWmPaint |
+                ControlStyles.OptimizedDoubleBuffer |
+                ControlStyles.ResizeRedraw,
+                true);
+            this.DoubleBuffered = true;
+
             InitializeComponent();
             SetupUI();
+            Theme.EnableDoubleBuffering(this);
             AutoAjustarAoIniciar();
+        }
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                cp.ExStyle |= 0x02000000; // WS_EX_COMPOSITED — compõe todos os controles filhos sem piscar
+                return cp;
+            }
         }
 
         private void SetupUI()
@@ -94,20 +114,37 @@ namespace TronusDesktop
             titleLabel.DoubleClick += (s, e) => ToggleMaximize();
             topBar.Controls.Add(titleLabel);
 
-            // Container para os botões da janela, acessibilidade e conectividade (painel com posições absolutas)
+            // Container para os botões da janela, acessibilidade, QA e conectividade (painel com posições absolutas)
             windowButtonsPanel = new Panel
             {
                 Dock = DockStyle.Right,
-                Width = 415,
+                Width = 530,
                 Height = 40,
                 BackColor = Theme.TopBarBackground
             };
+
+            // Botão Setup (Menu de QA / Testes e Acessibilidade de Fonte)
+            btnSetup = new Button
+            {
+                Text = "⚙️ Setup",
+                Size = new Size(105, 30),
+                Location = new Point(10, 5),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                BackColor = Color.FromArgb(30, 34, 48),
+                Cursor = Cursors.Hand,
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+            btnSetup.FlatAppearance.BorderSize = 1;
+            btnSetup.FlatAppearance.BorderColor = Theme.Gold;
+            btnSetup.Click += (s, e) => AbrirMenuSetup();
 
             // Botão/Indicador de Conectividade (Modo Online / Modo Offline Demo)
             btnOfflineStatus = new Button
             {
                 Size = new Size(115, 30),
-                Location = new Point(10, 5),
+                Location = new Point(123, 5),
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
                 Cursor = Cursors.Hand,
@@ -130,7 +167,7 @@ namespace TronusDesktop
             btnTheme = new AccessibilityThemeButton
             {
                 Size = new Size(130, 30),
-                Location = new Point(135, 5)
+                Location = new Point(246, 5)
             };
 
             // Botão Minimizar
@@ -140,7 +177,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(275, 0),
+                Location = new Point(385, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 9F, FontStyle.Bold)
             };
@@ -156,7 +193,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(320, 0),
+                Location = new Point(430, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 10F, FontStyle.Bold)
             };
@@ -172,7 +209,7 @@ namespace TronusDesktop
                 ForeColor = Theme.Gold,
                 FlatStyle = FlatStyle.Flat,
                 Size = new Size(45, 40),
-                Location = new Point(365, 0),
+                Location = new Point(475, 0),
                 Cursor = Cursors.Hand,
                 Font = new Font("Segoe UI", 11F, FontStyle.Bold)
             };
@@ -181,6 +218,7 @@ namespace TronusDesktop
             closeBtn.MouseEnter += (s, e) => closeBtn.BackColor = Color.FromArgb(60, 255, 50, 50);
             closeBtn.MouseLeave += (s, e) => closeBtn.BackColor = Color.Transparent;
 
+            windowButtonsPanel.Controls.Add(btnSetup);
             windowButtonsPanel.Controls.Add(btnOfflineStatus);
             windowButtonsPanel.Controls.Add(btnTheme);
             windowButtonsPanel.Controls.Add(btnMinimize);
@@ -285,10 +323,26 @@ namespace TronusDesktop
 
         public void LoadControl(UserControl uc)
         {
-            contentPanel.Controls.Clear();
-            uc.Dock = DockStyle.Fill;
-            Theme.ApplyTheme(uc);
-            contentPanel.Controls.Add(uc);
+            contentPanel.SuspendLayout();
+            try
+            {
+                var oldControls = new Control[contentPanel.Controls.Count];
+                contentPanel.Controls.CopyTo(oldControls, 0);
+
+                uc.Dock = DockStyle.Fill;
+                Theme.ApplyTheme(uc);
+                contentPanel.Controls.Add(uc);
+
+                foreach (var old in oldControls)
+                {
+                    contentPanel.Controls.Remove(old);
+                    old.Dispose();
+                }
+            }
+            finally
+            {
+                contentPanel.ResumeLayout(true);
+            }
         }
 
         private void OnThemeChanged()
@@ -308,7 +362,219 @@ namespace TronusDesktop
                 Theme.ApplyTheme(contentPanel.Controls[0]);
             }
 
+            if (btnSetup != null)
+            {
+                btnSetup.ForeColor = Theme.Gold;
+                btnSetup.BackColor = Theme.IsDarkMode ? Color.FromArgb(30, 34, 48) : Color.FromArgb(240, 232, 212);
+                btnSetup.FlatAppearance.BorderColor = Theme.Gold;
+            }
             AtualizarVisualModoOffline();
+        }
+
+        /// <summary>
+        /// Abre o painel de Setup contendo o botão QA (para ações de teste de software)
+        /// e as opções de Acessibilidade (aumentar/diminuir tamanho da fonte em toda a tela).
+        /// </summary>
+        private void AbrirMenuSetup()
+        {
+            using var setupDialog = new Form
+            {
+                Text = "Setup — QA & Acessibilidade",
+                FormBorderStyle = FormBorderStyle.None,
+                StartPosition = FormStartPosition.Manual,
+                Size = new Size(360, 310),
+                BackColor = Theme.IsDarkMode ? Color.FromArgb(20, 22, 30) : Color.FromArgb(245, 240, 230),
+                ShowInTaskbar = false,
+                TopMost = true
+            };
+
+            // Posiciona logo abaixo do botão Setup na barra superior
+            Point btnScreenPos = btnSetup.PointToScreen(new Point(0, btnSetup.Height + 4));
+            int x = Math.Min(btnScreenPos.X, Screen.FromControl(this).WorkingArea.Right - setupDialog.Width - 10);
+            int y = Math.Max(btnScreenPos.Y, Screen.FromControl(this).WorkingArea.Top + 10);
+            setupDialog.Location = new Point(x, y);
+
+            setupDialog.Paint += (s, e) =>
+            {
+                using var borderPen = new Pen(Theme.Gold, 2);
+                e.Graphics.DrawRectangle(borderPen, 1, 1, setupDialog.Width - 2, setupDialog.Height - 2);
+            };
+
+            var lblHeader = new Label
+            {
+                Text = "⚙️ CONFIGURAÇÕES (SETUP)",
+                Font = new Font("Segoe UI", 10.5F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                Location = new Point(16, 12),
+                AutoSize = true
+            };
+
+            var btnFecharPopup = new Button
+            {
+                Text = "✕",
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(28, 26),
+                Location = new Point(320, 8),
+                Cursor = Cursors.Hand
+            };
+            btnFecharPopup.FlatAppearance.BorderSize = 0;
+            btnFecharPopup.Click += (s, e) => setupDialog.Close();
+
+            // ─────────────────────────────────────────────────────
+            // SEÇÃO 1: QA — AÇÕES DE TESTE DE SOFTWARE
+            // ─────────────────────────────────────────────────────
+            var lblSecaoQa = new Label
+            {
+                Text = "🧪 MODO DE TESTE DE SOFTWARE (QA)",
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                ForeColor = Theme.DimText,
+                Location = new Point(16, 46),
+                AutoSize = true
+            };
+
+            var btnAbrirQa = new TronusButton
+            {
+                Text = "🧪 QA: Abrir Central de Testes",
+                Size = new Size(328, 38),
+                Location = new Point(16, 68),
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold)
+            };
+            btnAbrirQa.Click += (s, e) =>
+            {
+                setupDialog.Close();
+                LoadControl(new Views.UcTestRunner(autoRun: false));
+            };
+
+            var btnExecutarQaDireto = new Button
+            {
+                Text = "▶ QA: Executar Todos os Testes Agora",
+                Size = new Size(328, 32),
+                Location = new Point(16, 112),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                BackColor = Theme.IsDarkMode ? Color.FromArgb(30, 36, 48) : Color.FromArgb(235, 228, 210),
+                Cursor = Cursors.Hand
+            };
+            btnExecutarQaDireto.FlatAppearance.BorderColor = Theme.Gold;
+            btnExecutarQaDireto.FlatAppearance.BorderSize = 1;
+            btnExecutarQaDireto.Click += (s, e) =>
+            {
+                setupDialog.Close();
+                LoadControl(new Views.UcTestRunner(autoRun: true));
+            };
+
+            // ─────────────────────────────────────────────────────
+            // SEÇÃO 2: ACESSIBILIDADE — TAMANHO DA FONTE
+            // ─────────────────────────────────────────────────────
+            var lblSecaoFonte = new Label
+            {
+                Text = "🔠 ACESSIBILIDADE — TAMANHO DA FONTE",
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                ForeColor = Theme.DimText,
+                Location = new Point(16, 160),
+                AutoSize = true
+            };
+
+            var lblEscalaAtual = new Label
+            {
+                Text = $"Tamanho Atual: {(int)Math.Round(Theme.FontScale * 100)}%",
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                ForeColor = Theme.PrimaryText,
+                Location = new Point(16, 182),
+                AutoSize = true
+            };
+
+            var btnDiminuirFonte = new Button
+            {
+                Text = "A-  Diminuir",
+                Size = new Size(104, 38),
+                Location = new Point(16, 210),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                BackColor = Theme.IsDarkMode ? Color.FromArgb(32, 34, 44) : Color.FromArgb(235, 228, 210),
+                Cursor = Cursors.Hand
+            };
+            btnDiminuirFonte.FlatAppearance.BorderColor = Theme.Gold;
+
+            var btnPadraoFonte = new Button
+            {
+                Text = "100% Padrão",
+                Size = new Size(104, 38),
+                Location = new Point(128, 210),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 8.5F, FontStyle.Bold),
+                ForeColor = Theme.PrimaryText,
+                BackColor = Theme.IsDarkMode ? Color.FromArgb(32, 34, 44) : Color.FromArgb(235, 228, 210),
+                Cursor = Cursors.Hand
+            };
+            btnPadraoFonte.FlatAppearance.BorderColor = Theme.BorderColor;
+
+            var btnAumentarFonte = new Button
+            {
+                Text = "A+  Aumentar",
+                Size = new Size(104, 38),
+                Location = new Point(240, 210),
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
+                ForeColor = Theme.Gold,
+                BackColor = Theme.IsDarkMode ? Color.FromArgb(32, 34, 44) : Color.FromArgb(235, 228, 210),
+                Cursor = Cursors.Hand
+            };
+            btnAumentarFonte.FlatAppearance.BorderColor = Theme.Gold;
+
+            void AtualizarLabelEscala()
+            {
+                int pct = (int)Math.Round(Theme.FontScale * 100);
+                string desc = pct == 100 ? "(Padrão)" : pct > 100 ? "(Ampliado)" : "(Compacto)";
+                lblEscalaAtual.Text = $"Tamanho Atual: {pct}% {desc}";
+            }
+
+            btnDiminuirFonte.Click += (s, e) =>
+            {
+                Theme.DecreaseFontSize();
+                AtualizarLabelEscala();
+            };
+
+            btnPadraoFonte.Click += (s, e) =>
+            {
+                Theme.ResetFontSize();
+                AtualizarLabelEscala();
+            };
+
+            btnAumentarFonte.Click += (s, e) =>
+            {
+                Theme.IncreaseFontSize();
+                AtualizarLabelEscala();
+            };
+
+            var lblDicaAtalho = new Label
+            {
+                Text = "Dica: Atalhos rápidos Ctrl + (+) / Ctrl + (-) / F12 (QA)",
+                Font = new Font("Segoe UI", 7.8F, FontStyle.Italic),
+                ForeColor = Theme.DimText,
+                Location = new Point(16, 262),
+                AutoSize = true
+            };
+
+            AtualizarLabelEscala();
+
+            setupDialog.Controls.Add(lblHeader);
+            setupDialog.Controls.Add(btnFecharPopup);
+            setupDialog.Controls.Add(lblSecaoQa);
+            setupDialog.Controls.Add(btnAbrirQa);
+            setupDialog.Controls.Add(btnExecutarQaDireto);
+            setupDialog.Controls.Add(lblSecaoFonte);
+            setupDialog.Controls.Add(lblEscalaAtual);
+            setupDialog.Controls.Add(btnDiminuirFonte);
+            setupDialog.Controls.Add(btnPadraoFonte);
+            setupDialog.Controls.Add(btnAumentarFonte);
+            setupDialog.Controls.Add(lblDicaAtalho);
+
+            setupDialog.ShowDialog(this);
         }
 
         private void AtualizarVisualModoOffline()
@@ -336,6 +602,26 @@ namespace TronusDesktop
             if (keyData == (Keys.Control | Keys.T) || keyData == (Keys.Alt | Keys.A))
             {
                 Theme.ToggleTheme();
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.Q) || keyData == Keys.F12)
+            {
+                LoadControl(new Views.UcTestRunner());
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.Oemplus) || keyData == (Keys.Control | Keys.Add))
+            {
+                Theme.IncreaseFontSize();
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.OemMinus) || keyData == (Keys.Control | Keys.Subtract))
+            {
+                Theme.DecreaseFontSize();
+                return true;
+            }
+            if (keyData == (Keys.Control | Keys.D0) || keyData == (Keys.Control | Keys.NumPad0))
+            {
+                Theme.ResetFontSize();
                 return true;
             }
             return base.ProcessCmdKey(ref msg, keyData);

@@ -46,6 +46,8 @@ namespace TronusDesktop.Views
 
         public UcReinos()
         {
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
             InitializeComponent();
             SetupUI();
         }
@@ -383,7 +385,10 @@ namespace TronusDesktop.Views
 
         private void RenderizarReinos(List<ReinoDto> reinos, List<ProgressoFaseDto> progresso)
         {
-            flowReinos.Controls.Clear();
+            flowReinos.SuspendLayout();
+            try
+            {
+                flowReinos.Controls.Clear();
 
             foreach (var reino in reinos)
             {
@@ -514,6 +519,12 @@ namespace TronusDesktop.Views
                 }
 
                 flowReinos.Controls.Add(card);
+            }
+            }
+            finally
+            {
+                Theme.EnableDoubleBuffering(flowReinos);
+                flowReinos.ResumeLayout(true);
             }
         }
     }

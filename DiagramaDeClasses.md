@@ -1,88 +1,43 @@
-# 🏛️ Diagrama de Classes — Sistema Tronus
+# 🏛️ Diagrama de Classes (UML) — Sistema Tronus
 
 **Projeto Integrado Multidisciplinar (PIM III) — UNIP 2026**  
 **Curso:** Superior de Tecnologia em Análise e Desenvolvimento de Sistemas (ADS)  
-**Disciplina de Referência:** Programação Orientada a Objetos / Engenharia de Software  
-**Ferramenta CASE Oficial:** Astah Community / Astah UML  
-**Arquivo do Projeto:** `docs/Engenharia de software ágil aplicada.asta`  
+**Disciplina de Referência:** Programação Orientada a Objetos / Engenharia de Software Ágil Aplicada  
+**Ferramenta CASE Oficial:** Astah UML  
+**Arquivos Modelados (`.asta` e `.astah`):**
+- `docs/DiagramasDeClasses.asta` / `docs/DiagramasDeClasses.astah`
+- `docs/Engenharia de software ágil aplicada.asta` (Pacote `02_DiagramasDeClasses`)
 
 ---
 
 ## 📌 Sumário
 
-1. [Visão Geral](#1-visão-geral)
-2. [Status Atual do Arquivo Astah (`.asta`)](#2-status-atual-do-arquivo-astah-asta)
-3. [Como Criar o Diagrama de Classes no Astah UML (Passo a Passo)](#3-como-criar-o-diagrama-de-classes-no-astah-uml-passo-a-passo)
-4. [Diagrama de Classes Conceitual Completo (UML)](#4-diagrama-de-classes-conceitual-completo-uml)
-5. [Dicionário de Classes do Domínio](#5-dicionário-de-classes-do-domínio)
-6. [Relacionamentos e Multiplicidades](#6-relacionamentos-e-multiplicidades)
-7. [Diagrama de Classes da Aplicação Desktop (C# / .NET 10)](#7-diagrama-de-classes-da-aplicação-desktop-c--net-10)
+1. [Visão Geral e Metodologia](#1-visão-geral-e-metodologia)
+2. [DC01 — Diagrama de Classes de Domínio (Entidades de Negócio)](#2-dc01--diagrama-de-classes-de-domínio-entidades-de-negócio)
+3. [Dicionário de Classes do Domínio](#3-dicionário-de-classes-do-domínio)
+4. [Relacionamentos e Multiplicidades](#4-relacionamentos-e-multiplicidades)
+5. [DC02 — Diagrama de Classes da Arquitetura Tronus Desktop (.NET 10 / C#)](#5-dc02--diagrama-de-classes-da-arquitetura-tronus-desktop-net-10--c)
+6. [Dicionário de Componentes da Aplicação Desktop](#6-dicionário-de-componentes-da-aplicação-desktop)
 
 ---
 
-## 1. Visão Geral
+## 1. Visão Geral e Metodologia
 
-O **Diagrama de Classes** é o mais importante diagrama estrutural da UML. Ele modela a visão estática do sistema Tronus, especificando as entidades de negócio, seus atributos privados com tipagem, seus métodos públicos de manipulação e as relações de associação, agregação, composição e herança entre elas.
+O **Diagrama de Classes** modela a estrutura estática do sistema **Tronus**, especificando as entidades de domínio, seus atributos encapsulados (`private`), operações públicas (`public`) e as relações de associação, composição e herança entre as camadas.
 
-No contexto acadêmico do PIM III (UNIP), este diagrama fundamenta a **Seção 5.3 (Diagrama de Classes Conceitual)** do relatório escrito (`docs/PIM_III_Tronus.docx`).
-
----
-
-## 2. Status Atual do Arquivo Astah (`.asta`)
-
-Ao analisar a estrutura interna do arquivo do projeto `docs/Engenharia de software ágil aplicada.asta`:
-* **Diagramas Existentes:** O arquivo possui atualmente **2 Diagramas de Caso de Uso** (`Casos de uso - Estudante` e `Casos de uso - Professor / Administrador`).
-* **Diagrama de Classes:** Ainda **não foi criado** dentro do arquivo `.asta` (o contador de classes `UClassImp` é zero).
-
-> **Conclusão:** É perfeitamente possível e altamente recomendado criar o **Diagrama de Classes** dentro do próprio Astah UML, integrando todo o modelo de engenharia de software do PIM em um único arquivo de projeto!
+A modelagem está dividida em duas visões complementares:
+1. **`DC01 - Diagrama de Classes de Dominio`**: Representa as 8 entidades fundamentais de negócio e persistência relacional (`Usuario`, `Personagem`, `Reino`, `Fase`, `Questao`, `Alternativa`, `ProgressoFase` e `RespostaTentativa`).
+2. **`DC02 - Arquitetura Tronus Desktop`**: Representa a estrutura orientada a objetos do cliente desktop em C# (.NET 10 Windows Forms), abrangendo o orquestrador `MainForm`, os serviços (`ApiService`, `SessionManager`, `OfflineDataService`), o motor gráfico e de acessibilidade (`Theme`, `ControlesVisuaisGDI`) e as 12 telas (`UserControls`).
 
 ---
 
-## 3. Como Criar o Diagrama de Classes no Astah UML (Passo a Passo)
+## 2. DC01 — Diagrama de Classes de Domínio (Entidades de Negócio)
 
-Para criar o diagrama no Astah Community / UML:
+### 2.1 Imagem Exportada do Astah UML (`DC01`)
 
-1. **Abrir o Projeto no Astah:**
-   - Descompacte o arquivo `docs/Engenharia de software ágil aplicada.zip` se necessário.
-   - Abra o Astah e selecione `File -> Open` -> `Engenharia de software ágil aplicada.asta`.
+![DC01 - Diagrama de Classes de Domínio](IMG/DiagramaDeClasses/DC01%20-%20Diagrama%20de%20Classes%20de%20Dominio.png)
 
-2. **Criar o Diagrama de Classes:**
-   - Na árvore do projeto à esquerda (*Structure Tree*), clique com o botão direito no pacote raiz ou no pacote do projeto.
-   - Selecione: **`Create Diagram` $\rightarrow$ `Class Diagram`**.
-   - Nomeie o diagrama como: **`Diagrama de Classes - Tronus`**.
-
-3. **Inserir as Classes:**
-   - Na barra de ferramentas superior do Astah, clique no ícone **Class** (retângulo dividido em 3 compartimentos).
-   - Clique na área de desenho para adicionar cada classe:
-     - `Usuario`
-     - `Personagem`
-     - `Reino`
-     - `Fase`
-     - `Questao`
-     - `Alternativa`
-     - `ProgressoFase`
-     - `RespostaTentativa`
-
-4. **Adicionar Atributos e Métodos:**
-   - Dê um duplo clique no segundo compartimento da classe para inserir atributos (ex: `- id: int`, `- nome: String`).
-   - Dê um duplo clique no terceiro compartimento para inserir métodos (ex: `+ cadastrar(): boolean`, `+ salvar(): boolean`).
-   - Use os símbolos de visibilidade UML:
-     - `-` (Private / Privado) para atributos encapsulados.
-     - `+` (Public / Público) para métodos da interface da classe.
-
-5. **Traçar os Relacionamentos:**
-   - Use a ferramenta **Association** (linha contínua) ou **Composition** (losango preto preenchido) para ligar as classes.
-   - Defina as multiplicidades nas extremidades (`1`, `0..1`, `1..*`, `*`).
-
-6. **Exportar a Imagem para o Relatório do PIM:**
-   - Com o diagrama aberto, vá no menu: **`Tool` $\rightarrow$ `Export Image` $\rightarrow$ `Save Diagram as PNG/JPEG`**.
-   - Salve a imagem com alta resolução para inserir na **Seção 5.3** do relatório do PIM III no Microsoft Word!
-
----
-
-## 4. Diagrama de Classes Conceitual Completo (UML)
-
-Abaixo está o modelo completo em sintaxe Mermaid, pronto para ser desenhado no Astah e incluído na documentação:
+### 2.2 Especificação Estrutural (Mermaid UML)
 
 ```mermaid
 classDiagram
@@ -95,6 +50,7 @@ classDiagram
         -string celular
         -string senhaHash
         -string papel
+        -bool ativo
         -DateTime dataCriacao
         +cadastrar() bool
         +autenticar(senha: string) string
@@ -172,19 +128,17 @@ classDiagram
         -int personagemId
         -int questaoId
         -int alternativaId
+        -bool acertou
         -DateTime dataResposta
         +salvarTentativa() void
     }
 
-    %% Relacionamentos
     Usuario "1" -- "0..1" Personagem : possui >
     Personagem "1" *-- "0..*" ProgressoFase : registra >
     Personagem "1" -- "0..*" RespostaTentativa : submete >
-    
     Reino "1" *-- "3" Fase : composto por >
     Fase "1" *-- "0..*" Questao : contem >
     Fase "1" -- "0..*" ProgressoFase : avaliada em >
-    
     Questao "1" *-- "5" Alternativa : possui >
     Questao "1" -- "0..*" RespostaTentativa : respondida em >
     Alternativa "1" -- "0..*" RespostaTentativa : escolhida em >
@@ -192,196 +146,168 @@ classDiagram
 
 ---
 
-## 5. Dicionário de Classes do Domínio
+## 3. Dicionário de Classes do Domínio
 
-### 5.1 `Usuario`
-Representa a conta de acesso ao sistema (estudante, professor ou administrador).
-* **Atributos:**
-  * `id: int`: Identificador único no banco de dados.
-  * `nome: string`: Nome completo do usuário.
-  * `email: string`: E-mail institucional único.
-  * `celular: string`: Telefone para contato e recuperação de senha.
-  * `senhaHash: string`: Hash seguro da senha.
-  * `papel: string`: Nível de acesso (`'aluno'`, `'professor'`, `'admin'`).
-  * `dataCriacao: DateTime`: Registro de quando a conta foi criada.
-* **Métodos:**
-  * `cadastrar(): bool`: Valida e persiste o novo usuário.
-  * `autenticar(senha: string): string`: Valida credenciais e gera o token JWT.
-  * `redefinirSenha(celular: string, novaSenha: string): bool`: Atualiza a senha após confirmação.
-  * `logout(): void`: Invalida o token e encerra a sessão ativa.
+| Classe | Responsabilidade no Domínio | Atributos Principais | Métodos Principais |
+| :--- | :--- | :--- | :--- |
+| **`Usuario`** | Conta institucional de acesso (aluno, professor ou administrador) com controle RBAC. | `id`, `nome`, `email`, `celular`, `senhaHash`, `papel`, `ativo`, `dataCriacao` | `cadastrar()`, `autenticar()`, `redefinirSenha()`, `logout()` |
+| **`Personagem`** | Alter-ego medieval do estudante que acumula estrelas e evolui de patente nobiliárquica. | `id`, `usuarioId`, `nome`, `genero`, `avatar`, `tituloAtual`, `totalEstrelas` | `salvar()`, `atualizarTitulo()`, `somarEstrelas()`, `getProgressoProximoTitulo()` |
+| **`Reino`** | Disciplina acadêmica do curso (Python, C++, Eng. Software, Banco de Dados, Redes). | `id`, `nome`, `descricao`, `icone`, `ordem`, `ativo` | `listarFases()`, `getStatusDisponibilidade()` |
+| **`Fase`** | Etapa pedagógica progressiva (1: Fundamentos, 2: Aprofundamento, 3: Desafio Mestre). | `id`, `reinoId`, `numero`, `nome`, `descricao` | `listarQuestoes()`, `verificarDesbloqueio()` |
+| **`Questao`** | Item avaliativo no padrão ENADE vinculado a uma fase específica. | `id`, `faseId`, `enunciado`, `nivelDificuldade`, `ordem` | `adicionarAlternativa()`, `validarResposta()` |
+| **`Alternativa`** | Opção de resposta vinculada a uma questão, contendo indicador de gabarito. | `id`, `questaoId`, `letra`, `texto`, `isCorreta` | `getTextoFormatado()` |
+| **`ProgressoFase`** | Histórico da melhor pontuação (`GREATEST`) e estrelas (0 a 3★) do herói por fase. | `id`, `personagemId`, `faseId`, `estrelas`, `pontuacaoMaxima`, `dataUltimaTentativa` | `registrarDesempenho()` |
+| **`RespostaTentativa`** | Registro de auditoria das submissões de respostas de cada questão pelo estudante. | `id`, `personagemId`, `questaoId`, `alternativaId`, `acertou`, `dataResposta` | `salvarTentativa()` |
 
 ---
 
-### 5.2 `Personagem`
-Representa o alter-ego medieval do estudante na jornada acadêmica.
-* **Atributos:**
-  * `id: int`: Identificador do herói.
-  * `usuarioId: int`: Chave estrangeira referenciando o `Usuario`.
-  * `nome: string`: Nome de batalha do herói (ex: *Sir Artur*).
-  * `genero: string`: Gênero escolhido (`'male'`, `'female'`).
-  * `avatar: string`: Caminho do arquivo da ilustração do avatar (`img/masc1.png`, etc.).
-  * `tituloAtual: string`: Patente nobiliárquica atual (`'Plebeu'`, `'Cavaleiro'`, `'Duque'`, `'Rei'`).
-  * `totalEstrelas: int`: Total consolidado de estrelas conquistadas.
-* **Métodos:**
-  * `salvar(): bool`: Persiste o herói no banco de dados.
-  * `atualizarTitulo(): string`: Recalcula o título com base nas metas (15, 30, 45 estrelas).
-  * `somarEstrelas(qtd: int): void`: Incrementa a pontuação geral do estudante.
-  * `getProgressoProximoTitulo(): int`: Retorna quantas estrelas faltam para a próxima patente.
+## 4. Relacionamentos e Multiplicidades
 
----
-
-### 5.3 `Reino`
-Representa cada uma das disciplinas do curso (Python, C++, Engenharia de Software, etc.).
-* **Atributos:**
-  * `id: int`: Identificador do reino.
-  * `nome: string`: Nome da matéria.
-  * `descricao: string`: Resumo e objetivos pedagógicos.
-  * `icone: string`: Arquivo do brasão/arte temático.
-  * `ordem: int`: Posição de exibição na grade curricular.
-  * `ativo: bool`: Indica se a matéria está habilitada.
-* **Métodos:**
-  * `listarFases(): List<Fase>`: Retorna as 3 fases do reino.
-  * `getStatusDisponibilidade(): string`: Retorna `"DISPONÍVEL"` ou `"EM BREVE"`.
-
----
-
-### 5.4 `Fase`
-Representa cada uma das três etapas de aprendizado de um Reino.
-* **Atributos:**
-  * `id: int`: Identificador da fase.
-  * `reinoId: int`: Chave estrangeira do Reino correspondente.
-  * `numero: int`: Número da fase (1: Fundamentos, 2: Aprofundamento, 3: Desafio Mestre).
-  * `nome: string`: Nome temático da fase.
-* **Métodos:**
-  * `listarQuestoes(): List<Questao>`: Obtém as 5 questões para o quiz.
-  * `verificarDesbloqueio(personagemId: int): bool`: Valida se o herói possui ao menos 1 estrela na fase anterior.
-
----
-
-### 5.5 `Questao` e `Alternativa`
-Estrutura de avaliação pedagógica no padrão ENADE.
-* **`Questao`:**
-  * `enunciado: string`: Texto-base com contexto teórico e situações-problema.
-  * `nivelDificuldade: string`: Grau de complexidade (`'facil'`, `'medio'`, `'dificil'`).
-  * `validarResposta(alternativaId: int): bool`: Compara a opção com o gabarito.
-* **`Alternativa`:**
-  * `letra: char`: Letra da opção (`A`, `B`, `C`, `D` ou `E`).
-  * `texto: string`: Texto explicativo da assertiva.
-  * `isCorreta: bool`: Flag booleana que indica o gabarito oficial.
-
----
-
-### 5.6 `ProgressoFase`
-Armazena a conquista do herói em cada fase específica.
-* **Atributos:**
-  * `estrelas: int`: Quantidade de estrelas obtidas na fase (0 a 3).
-  * `pontuacaoMaxima: int`: Maior pontuação histórica já registrada (`GREATEST`).
-  * `dataUltimaTentativa: DateTime`: Data/hora da última execução do quiz.
-* **Métodos:**
-  * `registrarDesempenho(novasEstrelas: int): void`: Atualiza o registro caso a nova nota supere a anterior.
-
----
-
-## 6. Relacionamentos e Multiplicidades
-
-| Origem | Destino | Tipo de Relação | Multiplicidade | Descrição Semântica |
+| Origem | Destino | Tipo de Relação | Multiplicidade | Regra Semântica |
 | :--- | :--- | :---: | :---: | :--- |
-| `Usuario` | `Personagem` | Associação | `1` para `0..1` | Cada usuário possui no máximo um herói acadêmico vinculado. |
-| `Personagem` | `ProgressoFase` | Composição | `1` para `0..*` | O progresso pertence exclusivamente ao herói; se o herói for excluído, seu histórico é removido. |
-| `Reino` | `Fase` | Composição | `1` para `3` | Cada reino é composto estritamente por 3 fases pedagógicas. |
-| `Fase` | `Questao` | Composição | `1` para `0..*` | As questões pertencem a uma fase específica. |
-| `Questao` | `Alternativa` | Composição | `1` para `5` | Cada questão ENADE é composta por 5 alternativas (A a E). |
-| `Personagem` | `RespostaTentativa` | Associação | `1` para `0..*` | Registra as marcações feitas pelo aluno nas tentativas. |
+| **`Usuario`** | **`Personagem`** | Associação | `1` para `0..1` | Cada estudante possui um único herói acadêmico; docentes e admins atuam sem herói. |
+| **`Personagem`** | **`ProgressoFase`** | Composição (`*--`) | `1` para `0..*` | O histórico de fases pertence exclusivamente ao personagem. |
+| **`Personagem`** | **`RespostaTentativa`** | Associação | `1` para `0..*` | O herói submete tentativas de resposta ao longo dos quizzes. |
+| **`Reino`** | **`Fase`** | Composição (`*--`) | `1` para `3` | Cada reino curricular é estruturado em 3 fases sequenciais. |
+| **`Fase`** | **`Questao`** | Composição (`*--`) | `1` para `0..*` | As questões compõem o acervo avaliativo de sua respectiva fase. |
+| **`Fase`** | **`ProgressoFase`** | Associação | `1` para `0..*` | Uma fase registra o desempenho alcançado por múltiplos personagens. |
+| **`Questao`** | **`Alternativa`** | Composição (`*--`) | `1` para `5` | Cada questão possui suas alternativas de múltipla escolha dependentes. |
+| **`Questao`** | **`RespostaTentativa`** | Associação | `1` para `0..*` | Cada tentativa referencia a questão respondida. |
+| **`Alternativa`** | **`RespostaTentativa`** | Associação | `1` para `0..*` | Cada tentativa referencia a alternativa assinalada pelo aluno. |
 
 ---
 
-## 7. Diagrama de Classes da Aplicação Desktop (C# / .NET 10)
+## 5. DC02 — Diagrama de Classes da Arquitetura Tronus Desktop (.NET 10 / C#)
 
-Para demonstrar a arquitetura de software implementada no cliente Desktop, o diagrama de classes da camada de apresentação e serviços é modelado a seguir:
+### 5.1 Imagem Exportada do Astah UML (`DC02`)
+
+![DC02 - Arquitetura Tronus Desktop](IMG/DiagramaDeClasses/DC02%20-%20Arquitetura%20Tronus%20Desktop.png)
+
+### 5.2 Especificação Arquitetural Desktop (Mermaid UML)
 
 ```mermaid
 classDiagram
     direction TB
 
-    class Form {
-        <<Windows Forms>>
-    }
-
-    class UserControl {
-        <<Windows Forms>>
-    }
-
     class MainForm {
+        <<Form>>
         -Panel topBar
-        -Label titleLabel
-        -Button btnMinimize
-        -Button btnMaximize
-        -Button closeBtn
         -Panel contentPanel
+        -Button btnSetup
+        -Button btnModeBadge
+        -AccessibilityThemeButton btnThemeToggle
+        -UserControl _currentControl
         +LoadControl(uc: UserControl) void
-        +ToggleMaximize() void
-        -AutoAjustarAoIniciar() void
-        #WndProc(ref m: Message) void
+        +AbrirMenuSetup() void
+        +ApplyFontScale() void
+        +ApplyTheme() void
+        +UpdateBadgeState() void
     }
 
     class ApiService {
         <<Singleton>>
         -HttpClient _httpClient
         -static ApiService _instance
-        +static ApiService Instance
+        +bool IsOfflineMode
         +GetAsync~T~(endpoint: string) Task~T~
         +PostAsync~TReq, TRes~(endpoint: string, data: TReq) Task~TRes~
+        +PutAsync~TReq, TRes~(endpoint: string, data: TReq) Task~TRes~
+        +DeleteAsync(endpoint: string) Task
     }
 
     class SessionManager {
         <<Static>>
         +static string AccessToken
         +static UsuarioDto CurrentUser
+        +static PersonagemDto CurrentHero
         +static bool IsLoggedIn
         +static Login(auth: AuthResponse) void
         +static Logout() void
     }
 
+    class OfflineDataService {
+        <<Static>>
+        +static PersonagemDto Heroi
+        +static List~ProgressoFaseDto~ Progresso
+        +static List~UsuarioDto~ UsuariosSistema
+        +static HandleGet(endpoint: string) object
+        +static HandlePost(endpoint: string, body: object) object
+        +static RegistrarOuAtualizarUsuario(nome: string, email: string, papel: string) UsuarioDto
+        +static RemoverUsuario(id: int) bool
+    }
+
     class Theme {
         <<Static>>
+        +static bool IsDarkMode
+        +static float FontScale
         +static Color Background
         +static Color Gold
         +static Color PrimaryText
+        +static ToggleTheme() void
+        +static IncreaseFontSize() bool
+        +static DecreaseFontSize() bool
+        +static ResetFontSize() void
+        +static ApplyFontScaleToControl(root: Control) void
     }
 
-    class TronusButton {
+    class ControlesVisuaisGDI {
+        <<UI Kit>>
+        +TronusButton
+        +TronusPanel
+        +AccessibilityThemeButton
+        +PasswordToggleButton
         #OnPaint(e: PaintEventArgs) void
     }
 
-    class TronusPanel {
-        #OnPaint(e: PaintEventArgs) void
+    class UserControlBase {
+        <<Windows Forms>>
+        +bool DoubleBuffered
+        +EnableDoubleBuffering(ctrl: Control) void
     }
 
-    class UcLanding
-    class UcLogin
-    class UcRegister
-    class UcCharacter
-    class UcReinos
-    class UcQuiz
-    class UcDashboard
+    class ViewsAutenticacao {
+        +UcLanding
+        +UcLogin
+        +UcRegister
+        +UcForgotPassword
+    }
 
-    Form <|-- MainForm
-    MainForm o-- UserControl : hospeda via LoadControl >
-    MainForm ..> ApiService : consome >
-    MainForm ..> SessionManager : valida sessão >
+    class ViewsJornadaAluno {
+        +UcCharacter
+        +UcReinos
+        +UcQuiz
+        +UcDashboard
+        +UcRanking
+    }
 
-    UserControl <|-- UcLanding
-    UserControl <|-- UcLogin
-    UserControl <|-- UcRegister
-    UserControl <|-- UcCharacter
-    UserControl <|-- UcReinos
-    UserControl <|-- UcQuiz
-    UserControl <|-- UcDashboard
+    class ViewsGestaoEQA {
+        +UcProfessor
+        +UcAdmin
+        +UcTestRunner
+    }
 
-    Button <|-- TronusButton
-    Panel <|-- TronusPanel
-
-    UcReinos ..> ApiService
-    UcQuiz ..> ApiService
-    UcLogin ..> SessionManager
+    MainForm --> UserControlBase : hospeda via LoadControl >
+    MainForm --> SessionManager : valida sessao >
+    MainForm --> ApiService : consome >
+    MainForm *-- ControlesVisuaisGDI : compoe TopBar >
+    ApiService --> OfflineDataService : fallback em memoria >
+    ControlesVisuaisGDI --> Theme : aplica cores e escala >
+    UserControlBase <|-- ViewsAutenticacao
+    UserControlBase <|-- ViewsJornadaAluno
+    UserControlBase <|-- ViewsGestaoEQA
 ```
+
+---
+
+## 6. Dicionário de Componentes da Aplicação Desktop
+
+| Camada / Classe | Papel Arquitetural | Componentes Integrados |
+| :--- | :--- | :--- |
+| **`MainForm`** | Janela principal sem bordas nativas (*borderless*), com composição gráfica anti-flicker (`WS_EX_COMPOSITED`), TopBar global e botão **`⚙️ Setup`**. | `LoadControl()`, `AbrirMenuSetup()`, `ApplyFontScale()`, `ApplyTheme()` |
+| **`ApiService`** | Cliente HTTP Singleton com autenticação `Bearer JWT` e chaveamento automático para modo offline em caso de indisponibilidade de rede. | `GetAsync()`, `PostAsync()`, `PutAsync()`, `DeleteAsync()`, `IsOfflineMode` |
+| **`OfflineDataService`** | Banco de dados relacional em memória RAM com 5 Reinos, 15 Fases, acervo de questões e 18 cadastros ativos pré-carregados. | `HandleGet()`, `HandlePost()`, `RegistrarOuAtualizarUsuario()`, `RemoverUsuario()` |
+| **`SessionManager`** | Gerenciador estático de estado de autenticação do cliente, preservando o usuário logado e seu herói ativo. | `AccessToken`, `CurrentUser`, `CurrentHero`, `Login()`, `Logout()` |
+| **`Theme` & `ControlesVisuaisGDI`** | Motor visual WCAG AAA com alternância instantânea entre tema *Dark Fantasy* e *Parchment Claro*, além de acessibilidade de fonte (`85%` a `145%`). | `TronusButton`, `TronusPanel`, `AccessibilityThemeButton`, `PasswordToggleButton` |
+| **`ViewsAutenticacao`** | Telas de entrada, autenticação, registro cadastral e recuperação de senha em 3 etapas. | `UcLanding`, `UcLogin`, `UcRegister`, `UcForgotPassword` |
+| **`ViewsJornadaAluno`** | Telas da experiência gamificada do estudante: criação de avatar, mapa curricular, arena de quiz, dashboard e quadro de honra. | `UcCharacter`, `UcReinos`, `UcQuiz`, `UcDashboard`, `UcRanking` |
+| **`ViewsGestaoEQA`** | Telas de gestão docente, governança administrativa (RBAC) e suíte automatizada de testes de software e rede (CT-01 a CT-16). | `UcProfessor`, `UcAdmin`, `UcTestRunner` |
