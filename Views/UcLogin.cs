@@ -233,7 +233,7 @@ namespace TronusDesktop.Views
 
                 var res = await TronusDesktop.Services.ApiService.Instance.PostAsync<TronusDesktop.Models.LoginRequest, TronusDesktop.Models.AuthResponse>("/auth/login", req);
                 
-                TronusDesktop.Services.SessionManager.Login(res);
+                TronusDesktop.Services.SessionManager.Login(res, req.Senha);
 
                 if (res.Usuario.Papel == "aluno")
                 {
@@ -315,11 +315,11 @@ namespace TronusDesktop.Views
                 var req = new TronusDesktop.Models.LoginRequest
                 {
                     Identificador = id,
-                    Senha = string.IsNullOrWhiteSpace(passBox.Text) ? "offline" : passBox.Text
+                    Senha = string.IsNullOrWhiteSpace(passBox.Text) ? "" : passBox.Text
                 };
 
                 var res = await TronusDesktop.Services.ApiService.Instance.PostAsync<TronusDesktop.Models.LoginRequest, TronusDesktop.Models.AuthResponse>("/auth/login", req);
-                TronusDesktop.Services.SessionManager.Login(res);
+                TronusDesktop.Services.SessionManager.Login(res, req.Senha);
 
                 if (res.Usuario.Papel == "aluno")
                 {

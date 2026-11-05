@@ -1,16 +1,16 @@
 # Documentação do Software — Tronus Desktop
 
-**Data de Atualização:** 16 de Outubro de 2026  
+**Data de Atualização:** 05 de Novembro de 2026  
 **Tecnologia:** C# (.NET 10.0 Windows Forms)  
 **Objetivo:** Migração do sistema web acadêmico gamificado "Tronus" para uma aplicação Desktop nativa em C#, mantendo a identidade visual "Dark Fantasy" (RPG) original e operando no modelo **Thin Client** integrado à API REST centralizada e banco de dados **PostgreSQL (Supabase)**.
 
 ---
 
 ## 1. Arquitetura e Framework Visual Customizado
-Devido à limitação visual do Windows Forms clássico, o projeto foi arquitetado não utilizando o *Designer* padrão para as telas base, mas sim componentes criados e desenhados nativamente via código (usando `System.Drawing.Drawing2D` e GDI+).
+Devido à limitação visual do Windows Forms clássico, o projeto foi arquitetado não utilizando o *Designer* padrão para as telas base, mas sim componentes criados e desenhados nativamente via código (usando `System.Drawing.Drawing2D` e GDI+), com dupla bufferização (`DoubleBuffered` e estilo Win32 `WS_EX_COMPOSITED`) para eliminar qualquer efeito de *flickering* (piscadas de tela).
 
 ### 1.1 `Theme.cs`
-Centraliza a paleta de cores globais do sistema:
+Centraliza a paleta de cores globais, escala tipográfica de acessibilidade (`FontScale` de 85% a 145%) e utilitário recursivo de Double Buffering (`EnableDoubleBuffering`):
 - `Background`: Fundo escuro base (`#1A1A1A`)
 - `CardBackground`: Preto semi-transparente para criar efeito *Glassmorphism* (`rgba(0, 0, 0, 0.5)`)
 - `Gold`: Dourado nobre característico da marca (`#D4AF37`)
@@ -114,8 +114,9 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 - **Camada Atmosférica de Contraste:** O evento `Paint` aplica uma camada escura translúcida sobre `fundo_reinos.jpg`, prevenindo áreas estouradas e clareadas do pergaminho do mapa.
 - **HUD Superior do Aluno (Player Topbar):**
   - Acoplado ao topo (`DockStyle.Top`, altura 75px) preenchendo toda a largura da tela.
-  - Avatar do Herói: Miniatura carregada dinamicamente com base no arquivo salvo (`masc1..3` ou `fem1..3`).
+  - Avatar do Herói (`pbAvatar`): Miniatura interativa clicável com moldura dourada carregada dinamicamente com base no arquivo salvo (`masc1..3` ou `fem1..3`).
   - Nome do Herói em destaque branco nítido e Insígnia do Título em dourado (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
+  - **Botão `⚙️ Meu Perfil`:** Posicionado no canto superior esquerdo ao lado do ícone do boneco do usuário (`pbAvatar`), abrindo a tela de ajustes cadastrais, troca de avatar e alteração de senha (`UcPerfilAluno`).
   - Contador de Estrelas Total (`⭐ X estrelas`).
   - Barra de Progresso Visual proporcional à meta do próximo título (`X / 15 para Cavaleiro`, `X / 30 para Duque`, `X / 50 para Rei`).
   - Ações no cabeçalho dinamicamente alinhadas à direita via `RepositionHudButtons()`: botão "Ranking 🏆", botão "Meu Desempenho 📊" e botão "Sair", todos 100% visíveis e centralizados verticalmente no HUD.
@@ -190,13 +191,29 @@ Todas as telas do aplicativo são construídas como `UserControls` injetáveis n
 
 ### 3.11 `UcAdmin.cs` (Painel Administrativo — Governança Global — RF13)
 - Módulo de gestão de governança e infraestrutura do Tronus Desktop para administradores do sistema.
-- **Painel de Métricas e KPIs Globais:** Cards estilizados exibindo contadores de usuários totais, heróis ativos, total de questões no acervo, estrelas acumuladas e taxa média geral de acertos.
-- **Gerenciamento Completo de Usuários:**
-  - Filtro interativo em tempo real por nome, e-mail ou papel (`aluno`, `professor`, `admin`).
+- **Painel de Métricas e KPIs Globais:** 6 cards estilizados exibindo contadores de cadastros ativos totais, estudantes ativos, professores de reino, administradores, total de questões no acervo e taxa média geral de acertos.
+- **Gerenciamento Completo de Todos os Cadastros Ativos:**
+  - Consome `GET /admin/usuarios` e sincroniza com `OfflineDataService.UsuariosSistema` (exibindo todos os 18+ cadastros ativos de alunos, professores dos 5 reinos e administradores).
+  - Filtro interativo em tempo real por nome, e-mail, herói ou papel (`aluno`, `professor`, `admin`).
   - Badges coloridos diferenciados para cada permissão de acesso.
   - Ação rápida para promoção/alternância de papel de acesso (`Papel ⟳`).
   - Exclusão com proteção que impede deletar a conta mestre de administrador.
   - Modal interativo para criação manual de novos usuários administrativos, docentes ou calouros.
+
+### 3.12 `UcPerfilAluno.cs` (Meu Perfil & Segurança da Conta do Aluno)
+- Tela dedicada à autogestão de dados cadastrais, personalização do Herói e segurança de credenciais do estudante, acessível pelo botão **`⚙️ Meu Perfil`** ou clicando diretamente no ícone do boneco do usuário no canto superior esquerdo de `UcReinos`.
+- **Card Esquerdo (`🛡️ Dados do Aluno & Identidade do Herói`):**
+  - Edição de **Nome Completo do Estudante**, **E-mail Acadêmico** e **Celular / WhatsApp de Recuperação**.
+  - Edição do **Nome do Herói** (exibido no Mapa dos Reinos e no Ranking) e visualização da patente nobiliárquica e total de estrelas.
+  - **Galeria Interativa de Avatares (6 Bonecos):** Permite trocar entre `masc1.png` a `masc3.png` e `fem1.png` a `fem3.png` com destaque em borda dourada e atualização imediata no HUD superior.
+- **Card Direito (`🔐 Segurança & Alteração de Senha`):**
+  - Campos de **Senha Atual**, **Nova Senha** e **Confirmar Nova Senha**, todos integrados ao componente `PasswordToggleButton`.
+  - **Medidor de Força da Senha em Tempo Real:** Barra de progresso dinâmica que classifica a senha como *Fraca*, *Média*, *Forte* ou *Excelente*.
+  - **Checklist Dinâmico de Requisitos:** Indicadores que ficam verdes conforme o aluno atinge o mínimo de 6 caracteres, combinação alfanumérica e confirmação idêntica.
+
+### 3.13 `UcTestRunner.cs` (Central de Testes Automatizados e Homologação — QA Runner)
+- Acessada pelo botão **`⚙️ Setup`** na barra superior do `MainForm` (junto aos controles de escala de fonte `A-`, `100%` e `A+`).
+- Executa **16 suítes automatizadas de testes de software (`CT-01` a `CT-16`)** cobrindo testes unitários, integração, sistema, regressão, segurança/RBAC, acessibilidade WCAG e **Teste Real de Rede, DNS, Porta TCP 443 e Handshake HTTPS/REST (`CT-15`)**, com geração e exportação de laudo técnico em Markdown/TXT.
 
 ---
 

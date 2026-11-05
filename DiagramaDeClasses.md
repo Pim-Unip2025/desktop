@@ -219,20 +219,23 @@ classDiagram
         <<Static>>
         +static string AccessToken
         +static UsuarioDto CurrentUser
-        +static PersonagemDto CurrentHero
+        +static PersonagemDto CachedHero
         +static bool IsLoggedIn
-        +static Login(auth: AuthResponse) void
+        +static Login(auth: AuthResponse, senha: string) void
+        +static UpdateUserProfile(nome: string, email: string, celular: string, hero: PersonagemDto) void
         +static Logout() void
     }
 
     class OfflineDataService {
         <<Static>>
-        +static PersonagemDto Heroi
+        +static PersonagemDto CurrentHero
         +static List~ProgressoFaseDto~ Progresso
         +static List~UsuarioDto~ UsuariosSistema
         +static HandleGet(endpoint: string) object
         +static HandlePost(endpoint: string, body: object) object
-        +static RegistrarOuAtualizarUsuario(nome: string, email: string, papel: string) UsuarioDto
+        +static AtualizarPerfilCompleto(req: AtualizarPerfilRequest) PersonagemDto
+        +static AlterarSenhaUsuario(senhaAtual: string, novaSenha: string, out msg: string) bool
+        +static RegistrarOuAtualizarUsuario(novo: UsuarioDto) void
         +static RemoverUsuario(id: int) bool
     }
 
@@ -275,6 +278,7 @@ classDiagram
     class ViewsJornadaAluno {
         +UcCharacter
         +UcReinos
+        +UcPerfilAluno
         +UcQuiz
         +UcDashboard
         +UcRanking
@@ -305,9 +309,9 @@ classDiagram
 | :--- | :--- | :--- |
 | **`MainForm`** | Janela principal sem bordas nativas (*borderless*), com composição gráfica anti-flicker (`WS_EX_COMPOSITED`), TopBar global e botão **`⚙️ Setup`**. | `LoadControl()`, `AbrirMenuSetup()`, `ApplyFontScale()`, `ApplyTheme()` |
 | **`ApiService`** | Cliente HTTP Singleton com autenticação `Bearer JWT` e chaveamento automático para modo offline em caso de indisponibilidade de rede. | `GetAsync()`, `PostAsync()`, `PutAsync()`, `DeleteAsync()`, `IsOfflineMode` |
-| **`OfflineDataService`** | Banco de dados relacional em memória RAM com 5 Reinos, 15 Fases, acervo de questões e 18 cadastros ativos pré-carregados. | `HandleGet()`, `HandlePost()`, `RegistrarOuAtualizarUsuario()`, `RemoverUsuario()` |
-| **`SessionManager`** | Gerenciador estático de estado de autenticação do cliente, preservando o usuário logado e seu herói ativo. | `AccessToken`, `CurrentUser`, `CurrentHero`, `Login()`, `Logout()` |
+| **`OfflineDataService`** | Banco de dados relacional em memória RAM com 5 Reinos, 15 Fases, acervo de questões, 18 cadastros ativos e gestão de perfil/senha. | `HandleGet()`, `HandlePost()`, `AtualizarPerfilCompleto()`, `AlterarSenhaUsuario()`, `RegistrarOuAtualizarUsuario()`, `RemoverUsuario()` |
+| **`SessionManager`** | Gerenciador estático de estado de autenticação do cliente, preservando o usuário logado, senha e seu herói ativo. | `AccessToken`, `CurrentUser`, `CachedHero`, `Login()`, `UpdateUserProfile()`, `Logout()` |
 | **`Theme` & `ControlesVisuaisGDI`** | Motor visual WCAG AAA com alternância instantânea entre tema *Dark Fantasy* e *Parchment Claro*, além de acessibilidade de fonte (`85%` a `145%`). | `TronusButton`, `TronusPanel`, `AccessibilityThemeButton`, `PasswordToggleButton` |
 | **`ViewsAutenticacao`** | Telas de entrada, autenticação, registro cadastral e recuperação de senha em 3 etapas. | `UcLanding`, `UcLogin`, `UcRegister`, `UcForgotPassword` |
-| **`ViewsJornadaAluno`** | Telas da experiência gamificada do estudante: criação de avatar, mapa curricular, arena de quiz, dashboard e quadro de honra. | `UcCharacter`, `UcReinos`, `UcQuiz`, `UcDashboard`, `UcRanking` |
+| **`ViewsJornadaAluno`** | Telas da experiência gamificada do estudante: criação de avatar, mapa curricular, edição de perfil/avatar/senha (`⚙️ Meu Perfil`), arena de quiz, dashboard e quadro de honra. | `UcCharacter`, `UcReinos`, `UcPerfilAluno`, `UcQuiz`, `UcDashboard`, `UcRanking` |
 | **`ViewsGestaoEQA`** | Telas de gestão docente, governança administrativa (RBAC) e suíte automatizada de testes de software e rede (CT-01 a CT-16). | `UcProfessor`, `UcAdmin`, `UcTestRunner` |

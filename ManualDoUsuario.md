@@ -154,28 +154,33 @@ Para alunos que já possuem conta cadastrada:
 Esta é a central de comando da sua jornada acadêmica. O layout é dividido em duas áreas principais:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ [Avatar] Nome do Herói - 🛡️ Plebeu   ⭐ 12 estrelas   [====    ] para Cavaleiro   [Desempenho] [Sair] │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ ⚔️ MAPA DOS REINOS                                                          │
-│ Escolha uma matéria, enfrente os desafios das fases e conquiste suas estrelas.│
-│                                                                             │
-│ ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│ │ 🐍 PYTHON    │  │ ⚙️ C++       │  │ 📐 ENG SOFT  │  │ 🗄️ B. DADOS  │ ...  │
-│ │ [DISPONÍVEL] │  │ [DISPONÍVEL] │  │ [EM BREVE]   │  │ [DISPONÍVEL] │      │
-│ │ Fase 1 ★★★   │  │ Fase 1 ★☆☆   │  │ Fase 1 ☆☆☆   │  │ Fase 1 ★★★   │      │
-│ │ Fase 2 ★★☆   │  │ Fase 2 ☆☆☆   │  │ Fase 2 ☆☆☆   │  │ Fase 2 ★☆☆   │      │
-│ │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │      │
-│ │ [JOGAR]      │  │ [JOGAR]      │  │ [AGUARDE]    │  │ [JOGAR]      │      │
-│ └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘      │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────────────────────────┐
+│ [Avatar] Nome do Herói - 🛡️ Plebeu  [⚙️ Meu Perfil]  ⭐ 12 estrelas  [====  ]  [Ranking] [Desempenho] [Sair] │
+├───────────────────────────────────────────────────────────────────────────────────────────────┤
+│ ⚔️ MAPA DOS REINOS                                                                            │
+│ Escolha uma matéria, enfrente os desafios das fases e conquiste suas estrelas.                │
+│                                                                                               │
+│ ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                        │
+│ │ 🐍 PYTHON    │  │ ⚙️ C++       │  │ 📐 ENG SOFT  │  │ 🗄️ B. DADOS  │ ...                    │
+│ │ [DISPONÍVEL] │  │ [DISPONÍVEL] │  │ [EM BREVE]   │  │ [DISPONÍVEL] │                        │
+│ │ Fase 1 ★★★   │  │ Fase 1 ★☆☆   │  │ Fase 1 ☆☆☆   │  │ Fase 1 ★★★   │                        │
+│ │ Fase 2 ★★☆   │  │ Fase 2 ☆☆☆   │  │ Fase 2 ☆☆☆   │  │ Fase 2 ★☆☆   │                        │
+│ │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │  │ Fase 3 ☆☆☆   │                        │
+│ │ [JOGAR]      │  │ [JOGAR]      │  │ [AGUARDE]    │  │ [JOGAR]      │                        │
+│ └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘                        │
+└───────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 1. HUD Superior (Barra do Jogador)
-* **Avatar em Miniatura:** Exibe o rosto do herói escolhido no cadastro.
+* **Avatar em Miniatura (Boneco Clicável):** Exibe o rosto do herói no canto superior esquerdo com moldura dourada. Clicar sobre o boneco abre a central **Meu Perfil & Segurança**.
 * **Nome e Título:** O nome do seu herói e a insígnia correspondente ao nível de prestígio acadêmico (`🛡️ Plebeu`, `🎖️ Cavaleiro`, `🦅 Duque`, `👑 Rei`).
+* **Botão "⚙️ Meu Perfil" (Ao lado do Boneco do Usuário):** Localizado no canto superior esquerdo ao lado do ícone do boneco do usuário. Permite:
+  * **Ajustar Dados Cadastrais:** Alterar Nome Completo, E-mail Acadêmico e Celular de Recuperação.
+  * **Personalizar o Herói e Trocar o Boneco/Avatar:** Editar o Nome do Herói e escolher entre os 6 avatares medievais (`masc1..3` e `fem1..3`) com visualização em tempo real.
+  * **Alterar a Senha da Conta:** Redefinir a senha informando a Senha Atual, a Nova Senha (com medidor de força em tempo real e checklist de segurança) e a Confirmação de Senha.
 * **Estrelas Totais:** Soma de todas as melhores pontuações conquistadas em todas as matérias.
 * **Barra de Progresso Dinâmica:** Mostra visualmente quanto falta para a próxima patente nobre (ex: `12 / 15 para Cavaleiro`).
+* **Botão "Ranking 🏆":** Abre o Hall dos Heróis com o pódio e a classificação geral.
 * **Botão "Meu Desempenho 📊":** Abre o relatório detalhado de rendimento.
 * **Botão "Sair":** Efetua o logout seguro da sua conta.
 

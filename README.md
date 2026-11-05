@@ -133,7 +133,8 @@ TronusDesktop/
 │   ├── UcForgotPassword.cs      # Recuperação de senha em 3 etapas (SMS)
 │   ├── UcRegister.cs            # Cadastro de novo estudante
 │   ├── UcCharacter.cs           # Seleção de gênero e escolha de avatar
-│   ├── UcReinos.cs              # Mapa dos 5 reinos e fases com HUD do herói
+│   ├── UcReinos.cs              # Mapa dos 5 reinos e fases com HUD do herói e botão Meu Perfil (⚙️)
+│   ├── UcPerfilAluno.cs         # Meu Perfil & Segurança (Ajuste de dados cadastrais, troca de boneco/avatar e alteração de senha)
 │   ├── UcQuiz.cs                # Desafios de combate com 5 questões pedagógicas
 │   ├── UcDashboard.cs           # Painel analítico com KPIs, gráfico por reino e tabela
 │   ├── UcRanking.cs             # Hall dos heróis com pódio e classificação geral
@@ -196,6 +197,8 @@ stateDiagram-v2
     UcLogin --> UcCharacter: Aluno sem Herói (404 em /personagens/me)
     UcLogin --> UcReinos: Aluno com Herói Existente (200 OK)
     UcCharacter --> UcReinos: Personagem Criado com Sucesso
+    UcReinos --> UcPerfilAluno: "⚙️ Meu Perfil" ou Clique no Boneco
+    UcPerfilAluno --> UcReinos: "← Voltar ao Mapa"
     UcReinos --> UcDashboard: "Meu Desempenho"
     UcDashboard --> UcReinos: "Voltar ao Mapa"
 ```
@@ -204,8 +207,10 @@ stateDiagram-v2
 2. **`UcLogin` (Autenticação):** Formulário compacto centralizado com validação de campos vazios, suporte a submissão via tecla `Enter` e verificação assíncrona da existência de herói cadastrado.
 3. **`UcRegister` (Cadastro):** Validações em tempo real de e-mail, celular, nome de usuário e requisitos mínimos de senha (8+ caracteres, maiúsculas, minúsculas, números e símbolos).
 4. **`UcCharacter` (Criação de Personagem):** Seleção de gênero (Masculino/Feminino) que carrega dinamicamente os avatares disponíveis (`masc1..3` e `fem1..3`). Permite batizar o herói e envia os dados para `POST /personagens`.
-5. **`UcReinos` (Mapa de Reinos):** Carrega os 5 reinos e o progresso do aluno via API. Renderiza cards dinâmicos exibindo pontuação com estrelas preenchidas (`★`) e vazias (`☆`), habilitando o botão "Jogar" conforme a ordem de desbloqueio.
-6. **`UcDashboard` (Dashboard de Desempenho):** Exibe resumo das conquistas, total de estrelas, título atual e taxas de rendimento por matéria.
+5. **`UcReinos` (Mapa de Reinos):** Carrega os 5 reinos e o progresso do aluno via API. Exibe no canto superior esquerdo o boneco do usuário e o botão **`⚙️ Meu Perfil`**, além de renderizar cards dinâmicos exibindo pontuação com estrelas preenchidas (`★`) e vazias (`☆`).
+6. **`UcPerfilAluno` (Meu Perfil & Segurança):** Acessada pelo botão **`⚙️ Meu Perfil`** (ou clicando no ícone do boneco do usuário no canto superior esquerdo de `UcReinos`). Permite editar Nome Completo, E-mail Acadêmico, Celular de Recuperação, Nome do Herói, trocar entre os 6 bonecos/avatares (`masc1..3` e `fem1..3`) e alterar a senha da conta com medidor de força em tempo real e checklist de segurança.
+7. **`UcDashboard` (Dashboard de Desempenho):** Exibe resumo das conquistas, total de estrelas, título atual e taxas de rendimento por matéria.
+8. **`UcTestRunner` (Central QA & Testes Automatizados):** Acessada pelo menu **`⚙️ Setup`** na barra superior, executando 16 suítes automatizadas (`CT-01` a `CT-16`), incluindo teste real de rede/DNS/TLS (`CT-15`) e ajuste de escala tipográfica (`A- / 100% / A+`).
 
 ---
 
@@ -214,9 +219,11 @@ stateDiagram-v2
 | DTO | Finalidade | Campos Principais |
 |---|---|---|
 | `LoginRequest` | Envio de credenciais | `identificador`, `senha` |
-| `RegisterRequest` | Cadastro de novos alunos | `nome`, `email`, `celular`, `senha` |
+| `CadastroRequest` | Cadastro de novos alunos | `nome`, `email`, `celular`, `senha` |
+| `AtualizarPerfilRequest` | Ajuste de dados cadastrais e herói do aluno | `nome`, `email`, `celular`, `nome_heroi`, `genero`, `avatar` |
+| `AlterarSenhaRequest` | Alteração de senha da conta | `senha_atual`, `nova_senha`, `confirmar_senha` |
 | `AuthResponse` | Retorno de autenticação | `accessToken`, `tokenType`, `expiresIn`, `usuario` |
-| `UsuarioDto` | Perfil do usuário autenticado | `id`, `nome`, `email`, `papel` |
+| `UsuarioDto` | Perfil do usuário autenticado | `id`, `nome`, `email`, `celular`, `papel`, `heroiNome`, `ativo` |
 | `CriarPersonagemRequest` | Envio de criação do herói | `nome`, `genero`, `avatar` |
 | `PersonagemDto` | Estado do herói | `id`, `nome`, `genero`, `avatar`, `tituloAtual`, `totalEstrelas` |
 | `ReinoDto` | Lista de reinos | `id`, `nome`, `descricao` |
@@ -257,6 +264,8 @@ O executável gerado e as dependências estarão disponíveis em:
 | **CT-Desk-04** | Primeiro Login (Sem Herói) | Fazer login com conta recém-registrada | Redireciona automaticamente para `UcCharacter` |
 | **CT-Desk-05** | Seleção de Avatar | Alternar gênero entre Masculino e Feminino | Galeria de avatares recarrega as imagens correspondentes |
 | **CT-Desk-06** | Navegação ao Dashboard | Clicar em "Meu Desempenho" no mapa | Abre `UcDashboard` com botão "Voltar ao Mapa" funcional |
+| **CT-Desk-07** | Edição de Dados e Avatar do Aluno | Clicar em "⚙️ Meu Perfil" (ou no boneco) no canto superior esquerdo de `UcReinos` | Abre `UcPerfilAluno`, permite editar Nome, E-mail, Celular, Nome do Herói e trocar o boneco/avatar |
+| **CT-Desk-08** | Alteração de Senha do Aluno | Informar senha atual e nova senha em `UcPerfilAluno` | Valida requisitos de segurança, exibe força da senha e atualiza a credencial de acesso |
 
 ---
 

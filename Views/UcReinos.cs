@@ -18,6 +18,8 @@ namespace TronusDesktop.Views
         private PictureBox pbAvatar;
         private Label lblHeroName;
         private Label lblHeroTitle;
+        private TronusButton btnPerfil;
+        private PersonagemDto _heroiCarregado;
         private Label lblEstrelas;
         private Label lblProgressText;
         private Panel progressBarBg;
@@ -98,14 +100,21 @@ namespace TronusDesktop.Views
             };
             this.Controls.Add(topHudPanel);
 
-            // Avatar do herói
+            // Avatar do herói (Boneco do Usuário clicável)
             pbAvatar = new PictureBox
             {
-                Location = new Point(25, 12),
+                Location = new Point(18, 12),
                 Size = new Size(50, 50),
                 SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.FromArgb(35, 30, 25)
+                BackColor = Color.FromArgb(35, 30, 25),
+                Cursor = Cursors.Hand
             };
+            pbAvatar.Paint += (s, e) =>
+            {
+                using var pen = new Pen(Theme.Gold, 1.5f);
+                e.Graphics.DrawRectangle(pen, 0, 0, pbAvatar.Width - 1, pbAvatar.Height - 1);
+            };
+            pbAvatar.Click += (s, e) => AbrirPerfilAluno();
             topHudPanel.Controls.Add(pbAvatar);
 
             // Nome e Título do Herói
@@ -113,11 +122,13 @@ namespace TronusDesktop.Views
             {
                 Text = "Carregando...",
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 11.5F, FontStyle.Bold),
                 AutoSize = true,
-                Location = new Point(85, 14),
-                BackColor = Color.Transparent
+                Location = new Point(76, 14),
+                BackColor = Color.Transparent,
+                Cursor = Cursors.Hand
             };
+            lblHeroName.Click += (s, e) => AbrirPerfilAluno();
             topHudPanel.Controls.Add(lblHeroName);
 
             lblHeroTitle = new Label
@@ -126,19 +137,36 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.Gold,
                 Font = new Font("Segoe UI", 9.5F, FontStyle.Bold),
                 AutoSize = true,
-                Location = new Point(85, 38),
-                BackColor = Color.Transparent
+                Location = new Point(76, 38),
+                BackColor = Color.Transparent,
+                Cursor = Cursors.Hand
             };
+            lblHeroTitle.Click += (s, e) => AbrirPerfilAluno();
             topHudPanel.Controls.Add(lblHeroTitle);
+
+            // Botão de Perfil e Alteração de Senha (ao lado superior esquerdo junto ao boneco do usuário)
+            btnPerfil = new TronusButton
+            {
+                Text = "⚙️ Meu Perfil",
+                Size = new Size(118, 38),
+                Location = new Point(214, 18),
+                Font = new Font("Segoe UI", 8.8F, FontStyle.Bold)
+            };
+            btnPerfil.Click += (s, e) => AbrirPerfilAluno();
+            topHudPanel.Controls.Add(btnPerfil);
+
+            var hudToolTip = new ToolTip();
+            hudToolTip.SetToolTip(pbAvatar, "Clique para alterar senha, dados cadastrais ou avatar do Herói");
+            hudToolTip.SetToolTip(btnPerfil, "Alterar senha, e-mail, celular, nome e avatar do Herói");
 
             // Contador de estrelas
             lblEstrelas = new Label
             {
                 Text = "⭐ 0 estrelas",
                 ForeColor = Theme.Gold,
-                Font = new Font("Segoe UI", 13F, FontStyle.Bold),
+                Font = new Font("Segoe UI", 12.5F, FontStyle.Bold),
                 AutoSize = true,
-                Location = new Point(340, 15),
+                Location = new Point(346, 14),
                 BackColor = Color.Transparent
             };
             topHudPanel.Controls.Add(lblEstrelas);
@@ -150,15 +178,15 @@ namespace TronusDesktop.Views
                 ForeColor = Theme.DimText,
                 Font = new Font("Segoe UI", 8.5F),
                 AutoSize = true,
-                Location = new Point(340, 42),
+                Location = new Point(346, 42),
                 BackColor = Color.Transparent
             };
             topHudPanel.Controls.Add(lblProgressText);
 
             progressBarBg = new Panel
             {
-                Location = new Point(480, 45),
-                Size = new Size(160, 9),
+                Location = new Point(482, 45),
+                Size = new Size(106, 9),
                 BackColor = Color.FromArgb(40, 40, 40)
             };
             topHudPanel.Controls.Add(progressBarBg);
@@ -280,6 +308,11 @@ namespace TronusDesktop.Views
             };
         }
 
+        private void AbrirPerfilAluno()
+        {
+            (this.FindForm() as MainForm)?.LoadControl(new UcPerfilAluno(_heroiCarregado));
+        }
+
         private void RepositionHudButtons()
         {
             if (btnLogout != null && btnDashboard != null && topHudPanel != null)
@@ -308,6 +341,14 @@ namespace TronusDesktop.Views
                 var reinos = await taskReinos;
                 var progresso = await taskProgresso;
 
+                if (heroi != null && SessionManager.CachedHero != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(SessionManager.CachedHero.Nome)) heroi.Nome = SessionManager.CachedHero.Nome;
+                    if (!string.IsNullOrWhiteSpace(SessionManager.CachedHero.Genero)) heroi.Genero = SessionManager.CachedHero.Genero;
+                    if (!string.IsNullOrWhiteSpace(SessionManager.CachedHero.Avatar)) heroi.Avatar = SessionManager.CachedHero.Avatar;
+                }
+
+                _heroiCarregado = heroi;
                 AtualizarHudHeroi(heroi);
                 RenderizarReinos(reinos, progresso);
             }
@@ -320,6 +361,7 @@ namespace TronusDesktop.Views
         private void AtualizarHudHeroi(PersonagemDto heroi)
         {
             if (heroi == null) return;
+            _heroiCarregado = heroi;
 
             lblHeroName.Text = heroi.Nome;
 
@@ -333,6 +375,13 @@ namespace TronusDesktop.Views
             };
             lblHeroTitle.Text = $"{badgeIcon} {heroi.TituloAtual}";
             lblEstrelas.Text = $"⭐ {heroi.TotalEstrelas} estrelas";
+
+            if (btnPerfil != null)
+            {
+                int rightText = Math.Max(lblHeroName.Right, lblHeroTitle.Right);
+                int perfilX = Math.Max(195, Math.Min(224, rightText + 12));
+                btnPerfil.Location = new Point(perfilX, 18);
+            }
 
             // Imagem do Avatar
             if (!string.IsNullOrEmpty(heroi.Avatar))

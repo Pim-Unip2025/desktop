@@ -21,10 +21,103 @@ namespace TronusDesktop.Services
         private static Dictionary<int, List<QuestaoDto>> _questoesPorFase = new();
         private static List<UsuarioDto> _usuarios = new();
         private static readonly List<UsuarioDto> _usuariosCriadosNaSessao = new();
+        private static readonly Dictionary<string, string> _senhasUsuarios = new(StringComparer.OrdinalIgnoreCase);
         private static int _totalRespostasOffline = 30;
         private static int _totalAcertosOffline = 26;
 
         public static IReadOnlyList<UsuarioDto> UsuariosSistema => _usuarios;
+
+        public static PersonagemDto AtualizarPerfilCompleto(AtualizarPerfilRequest req)
+        {
+            if (req == null) return CurrentHero;
+
+            string emailAntigo = CurrentUser?.Email ?? SessionManager.CurrentUser?.Email ?? "";
+
+            if (CurrentUser == null)
+            {
+                CurrentUser = SessionManager.CurrentUser ?? new UsuarioDto
+                {
+                    Id = 101,
+                    Nome = req.Nome ?? "Arthur Pendragon",
+                    Email = req.Email ?? "arthur.demo@tronus.unip.br",
+                    Celular = req.Celular ?? "(11) 98765-4321",
+                    Papel = "aluno"
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(req.Nome)) CurrentUser.Nome = req.Nome.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Email)) CurrentUser.Email = req.Email.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Celular)) CurrentUser.Celular = req.Celular.Trim();
+
+            if (CurrentHero == null)
+            {
+                CurrentHero = SessionManager.CachedHero ?? new PersonagemDto
+                {
+                    Id = 1,
+                    Nome = !string.IsNullOrWhiteSpace(req.NomeHeroi) ? req.NomeHeroi.Trim() : "Sir Arthur",
+                    Genero = !string.IsNullOrWhiteSpace(req.Genero) ? req.Genero : "M",
+                    Avatar = !string.IsNullOrWhiteSpace(req.Avatar) ? req.Avatar : @"img\masc1.png",
+                    TituloAtual = "Duque",
+                    TotalEstrelas = 38
+                };
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(req.NomeHeroi)) CurrentHero.Nome = req.NomeHeroi.Trim();
+                if (!string.IsNullOrWhiteSpace(req.Genero)) CurrentHero.Genero = req.Genero;
+                if (!string.IsNullOrWhiteSpace(req.Avatar)) CurrentHero.Avatar = req.Avatar;
+            }
+
+            CurrentUser.HeroiNome = $"{CurrentHero.Nome} ({CurrentHero.TituloAtual} · {CurrentHero.TotalEstrelas}★)";
+
+            // Sincroniza também na lista global de usuários (caso o e-mail tenha mudado, atualiza o registro existente)
+            var existente = _usuarios.FirstOrDefault(u =>
+                (!string.IsNullOrWhiteSpace(emailAntigo) && u.Email.Equals(emailAntigo, StringComparison.OrdinalIgnoreCase)) ||
+                u.Email.Equals(CurrentUser.Email, StringComparison.OrdinalIgnoreCase) ||
+                u.Id == CurrentUser.Id);
+
+            if (existente != null)
+            {
+                existente.Nome = CurrentUser.Nome;
+                existente.Email = CurrentUser.Email;
+                existente.Celular = CurrentUser.Celular;
+                existente.HeroiNome = CurrentUser.HeroiNome;
+            }
+            else
+            {
+                RegistrarOuAtualizarUsuario(CurrentUser);
+            }
+
+            SessionManager.UpdateUserProfile(CurrentUser.Nome, CurrentUser.Email, CurrentUser.Celular, CurrentHero);
+            return CurrentHero;
+        }
+
+        public static bool AlterarSenhaUsuario(string senhaAtual, string novaSenha, out string mensagem)
+        {
+            if (string.IsNullOrWhiteSpace(novaSenha) || novaSenha.Trim().Length < 6)
+            {
+                mensagem = "A nova senha deve possuir no mínimo 6 caracteres.";
+                return false;
+            }
+
+            string chaveEmail = SessionManager.CurrentUser?.Email ?? CurrentUser?.Email ?? "arthur.demo@tronus.unip.br";
+            string chaveNome = SessionManager.CurrentUser?.Nome ?? CurrentUser?.Nome ?? "Arthur Pendragon";
+
+            if (_senhasUsuarios.TryGetValue(chaveEmail, out string senhaSalva) && !string.IsNullOrEmpty(senhaSalva))
+            {
+                if (!string.Equals(senhaSalva, senhaAtual))
+                {
+                    mensagem = "A senha atual informada está incorreta.";
+                    return false;
+                }
+            }
+
+            _senhasUsuarios[chaveEmail] = novaSenha;
+            _senhasUsuarios[chaveNome] = novaSenha;
+            SessionManager.CurrentPassword = novaSenha;
+            mensagem = "Sua senha de acesso foi atualizada com sucesso!";
+            return true;
+        }
 
         public static void RegistrarOuAtualizarUsuario(UsuarioDto novo)
         {
@@ -495,32 +588,64 @@ namespace TronusDesktop.Services
             // 1. Login
             if (endpoint == "/auth/login" && data is LoginRequest loginReq)
             {
-                string id = loginReq.Identificador?.ToLower() ?? "";
-                string papel = "aluno";
-                string nome = "Arthur Pendragon";
+                string id = loginReq.Identificador?.Trim() ?? "";
+                string idLower = id.ToLower();
 
-                if (id.Contains("prof"))
+                if (!string.IsNullOrWhiteSpace(id) &&
+                    !string.IsNullOrWhiteSpace(loginReq.Senha) &&
+                    _senhasUsuarios.TryGetValue(id, out string senhaSalva) &&
+                    !string.Equals(senhaSalva, loginReq.Senha))
                 {
-                    papel = "professor";
-                    nome = "Prof. Albus";
-                }
-                else if (id.Contains("adm"))
-                {
-                    papel = "admin";
-                    nome = "Admin Morgana";
-                }
-                else if (!string.IsNullOrWhiteSpace(loginReq.Identificador))
-                {
-                    nome = loginReq.Identificador;
+                    throw new ApiException(401, new ApiErrorResponse
+                    {
+                        StatusCode = 401,
+                        Message = "Senha incorreta! Utilize a nova senha definida no seu perfil."
+                    });
                 }
 
-                CurrentUser = new UsuarioDto
+                var existente = _usuarios.FirstOrDefault(u =>
+                    u.Email.Equals(id, StringComparison.OrdinalIgnoreCase) ||
+                    u.Nome.Equals(id, StringComparison.OrdinalIgnoreCase));
+
+                if (existente != null)
                 {
-                    Id = 101,
-                    Nome = nome,
-                    Email = $"{id.Replace(" ", ".")}@tronus.unip.br",
-                    Papel = papel
-                };
+                    CurrentUser = existente;
+                }
+                else
+                {
+                    string papel = "aluno";
+                    string nome = "Arthur Pendragon";
+
+                    if (idLower.Contains("prof"))
+                    {
+                        papel = "professor";
+                        nome = "Prof. Albus";
+                    }
+                    else if (idLower.Contains("adm"))
+                    {
+                        papel = "admin";
+                        nome = "Admin Morgana";
+                    }
+                    else if (!string.IsNullOrWhiteSpace(id))
+                    {
+                        nome = id;
+                    }
+
+                    CurrentUser = new UsuarioDto
+                    {
+                        Id = 101,
+                        Nome = nome,
+                        Email = id.Contains("@") ? id : $"{idLower.Replace(" ", ".")}@tronus.unip.br",
+                        Celular = "(11) 98765-4321",
+                        Papel = papel
+                    };
+                }
+
+                if (!string.IsNullOrWhiteSpace(loginReq.Senha))
+                {
+                    _senhasUsuarios[CurrentUser.Email] = loginReq.Senha;
+                    _senhasUsuarios[CurrentUser.Nome] = loginReq.Senha;
+                }
 
                 var authRes = new AuthResponse
                 {
@@ -541,11 +666,18 @@ namespace TronusDesktop.Services
                     Id = novoId,
                     Nome = regReq.Nome,
                     Email = regReq.Email,
+                    Celular = !string.IsNullOrWhiteSpace(regReq.Celular) ? regReq.Celular : "(11) 98765-4321",
                     Papel = "aluno",
                     HeroiNome = "Em criação",
                     DataCadastro = DateTime.Now.ToString("dd/MM/yyyy"),
                     Ativo = true
                 };
+
+                if (!string.IsNullOrWhiteSpace(regReq.Senha))
+                {
+                    _senhasUsuarios[CurrentUser.Email] = regReq.Senha;
+                    _senhasUsuarios[CurrentUser.Nome] = regReq.Senha;
+                }
 
                 RegistrarOuAtualizarUsuario(CurrentUser);
                 CurrentHero = null;
